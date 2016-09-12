@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jquery的方法与属性</title>
+</head>
+<body>
+	<ul>
+		<li class="li0">
+			aaa
+		</li>
+		<li>
+			bbb
+		</li>
+		<li>
+			ccc
+		</li>
+	</ul>
+	<script src="../jquery.js"></script>
+	<script>
+		//通过打断点的方式，观察代码是如何一步一步运行
+		$('ul li.li0');  
+
+		console.log( $().jquery );
+		console.log( $().constructor );
+
+		console.log($('li').parent());
+		console.log($('li').parent().end());
+
+		console.log( $( 'li' ).toArray() );
+
+
+		var rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/;
+
+		console.log( match = rquickExpr.exec( '<ul><li></li></ul>' )  );
+		console.log( match = rquickExpr.exec( '#id' )  );
+	</script>
+</body>
+</html>

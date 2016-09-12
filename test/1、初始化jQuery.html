@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>简易版jQuery工程</title>
+</head>
+<body>
+	<script>
+		(function(w, undefined) {
+			Person = function(name, age) {
+				return Person.fn.init(name, age);
+			}
+
+			Person.fn = Person.prototype = {
+				init: function(name, age) {
+					this.name = name;
+					this.age = age;
+					return this;
+				},
+				showInfo: function() {
+					alert( this.name+'---'+this.age );
+					return this;
+				},
+				setInfo: function(name,age) {
+					this.name = name;
+					this.age = age;
+					return this;
+				}
+			}
+
+
+			Person.fn.init.prototype = Person.fn;
+
+
+			w.Person = w._ = Person;
+		})(window);
+
+		//实现链式调用
+		_('sfq', 20).showInfo().setInfo('tom',18).showInfo();
+
+	</script>
+</body>
+</html>
