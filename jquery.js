@@ -840,7 +840,7 @@ jQuery.ready.promise = function( obj ) {
 	return readyList.promise( obj );
 };
 
-// Populate the class2type map
+// Populate the class2type map     判断obj的具体类型
 jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
 	class2type[ "[object " + name + "]" ] = name.toLowerCase();
 });
