@@ -859,7 +859,7 @@ function isArraylike( obj ) {
 
 	return type === "array" || type !== "function" &&
 		( length === 0 ||
-		typeof length === "number" && length > 0 && ( length - 1 ) in obj );
+		typeof length === " " && length > 0 && ( length - 1 ) in obj );
 }
 
 // All jQuery objects should point back to these

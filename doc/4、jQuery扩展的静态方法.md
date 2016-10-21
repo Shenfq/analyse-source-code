@@ -61,6 +61,12 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 	});
 
 
+
+----------
+
+
+
+
 下面分析几个经常使用的方法，多多熟悉熟悉jquery的写法和它的代码思想。
 
 先看看type方法，该方法就是用来返回一个变量类型字符串的，相当于typeof的加强版。
@@ -77,8 +83,107 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 	}
 
 
-class2type[ core_toString.call(obj) ] 具体判断类型就是通过这个方法，可以看到844行。
+class2type[ core_toString.call(obj) ] 具体判断类型就是通过这个方法，可以看到844行。其原理主要是通过对象原型下的toString方法返回一个字符串，该字符串可以判定该对象的具体类型。
 
 	jQuery.each("Boolean Number String Function Array Date RegExp Object Error".split(" "), function(i, name) {
 		class2type[ "[object " + name + "]" ] = name.toLowerCase();
 	});
+
+
+其后的isFunction、isPlainObject都用到了type方法。
+
+isArray方法在2.0版本的jquery中，因为不考虑ie8一下的兼容，直接使用了ECMA5中数组的原生方法来判断该变量是否为一个数组。
+
+`isArray: Array.isArray`
+
+isWindow只需要判断传入的对象是否有window属性等于本身就可以知道该对象是否为window对象。
+
+	isWindow: function( obj ) {
+		return obj != null && obj === obj.window;
+	}
+
+
+----------
+
+noConflict该方法用来防止重名的冲突。因为jQuery变量和$变量是暴露在window下的，可能会有其他库使用该变量名。
+在看该方法源码之前可以先看38--41行，可以看到jquery在加载之前先把全局变量中的jQuery变量和$变量存储到了_jQuery和_$中。
+
+	_jQuery = window.jQuery,
+	_$ = window.$,  
+	
+
+下面看看noConflict的源码，可以看到调用该方法后，jquery把$变量名重新交还给了jquery初始化之前的$变量，如果传入了deep为true，jquery也会把jQuery变量名交还出去。最后返回了jQuery变量，用户可以通过另一个自定义的变量名来接收jQuery变量。
+
+	noConflict: function( deep ) {  //用来防止jquery的 $ 的命名冲突
+		if ( window.$ === jQuery ) {
+			window.$ = _$;  
+		}
+
+		if ( deep && window.jQuery === jQuery ) {
+			window.jQuery = _jQuery;
+		}
+
+		return jQuery;
+	}
+
+
+----------
+
+接下来看看使用比较多的工具方法数组遍历和映射，each和map。
+
+**each：**
+each方法可以接受三个值：
+1.要遍历的数组
+2.为每个数组元素执行的回调函数，该函数传入两个值，当前索引和当前元素
+3.如果传入了最后一个值（数组），那么回调函数传入的参数为最后一个数组的元素。
+
+	each: function( obj, callback, args ) {
+		var value,
+			i = 0,
+			length = obj.length,//创建一个变量存储数组（或类数组对象）的长度
+			isArray = isArraylike( obj );//判断传入的对象是否为一个数组（或类数组对象）
+		//后面有两个if判断
+		//判断是否传入了args参数，如果有，则通过apply调用回调函数传入args
+		//判断是数组还是类数组对象，如果是数组使用for遍历数组，如果是类数组对象使用forin遍历对象
+		if ( args ) {
+			if ( isArray ) {
+				for ( ; i < length; i++ ) {
+					value = callback.apply( obj[ i ], args );
+
+					if ( value === false ) {
+						break;
+					}
+				}
+			} else {
+				for ( i in obj ) {
+					value = callback.apply( obj[ i ], args );
+
+					if ( value === false ) {
+						break;
+					}
+				}
+			}
+
+		// A special, fast, case for the most common use of each
+		} else {
+			if ( isArray ) {
+				for ( ; i < length; i++ ) {
+					value = callback.call( obj[ i ], i, obj[ i ] );
+
+					if ( value === false ) {
+						break;
+					}
+				}
+			} else {
+				for ( i in obj ) {
+					value = callback.call( obj[ i ], i, obj[ i ] );
+
+					if ( value === false ) {
+						break;
+					}
+				}
+			}
+		}
+
+		return obj;
+	}
