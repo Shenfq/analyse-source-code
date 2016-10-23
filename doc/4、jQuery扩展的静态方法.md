@@ -133,8 +133,8 @@ noConflict该方法用来防止重名的冲突。因为jQuery变量和$变量是
 
 **each：**
 each方法可以接受三个值：
-1.要遍历的数组
-2.为每个数组元素执行的回调函数，该函数传入两个值，当前索引和当前元素
+1.要遍历的数组或类数组变量；
+2.为每个数组元素执行的回调函数，该函数传入两个值，当前索引和当前元素；
 3.如果传入了最后一个值（数组），那么回调函数传入的参数为最后一个数组的元素。
 
 	each: function( obj, callback, args ) {
@@ -186,4 +186,69 @@ each方法可以接受三个值：
 		}
 
 		return obj;
+	}
+
+
+
+**map：**
+map方法是对一个数组进行映射，并返回一个新的数组。使用时传入三个参数：
+1.要遍历的数组或类数组对象；
+2.为该数组的每个元素执行的回调函数且返回值会插入的新数组，该函数接收三个值，当前元素、当前索引值、map方法传入的第三个值；
+3.给回调函数使用的值。
+
+
+	map: function( elems, callback, arg ) {
+		var value,
+			i = 0,
+			length = elems.length,
+			isArray = isArraylike( elems ),
+			ret = [];
+
+		// 判断当前对象是否为数组，如果是数组使用for来遍历数组元素，如果对象使用forin遍历对象的所有属性。
+		
+		if ( isArray ) {
+			for ( ; i < length; i++ ) {
+				//接受回调函数的返回值。
+				value = callback( elems[ i ], i, arg );
+				//如果对调函数的返回值不为空就将其存入到新数组。
+				if ( value != null ) {
+					ret[ ret.length ] = value;
+				}
+			}
+		} else {
+			for ( i in elems ) {
+				value = callback( elems[ i ], i, arg );
+
+				if ( value != null ) {
+					ret[ ret.length ] = value;
+				}
+			}
+		}
+
+		//最后将映射过的新数组返回
+		return core_concat.apply( [], ret );
+	}
+
+----------
+
+merge方法是用来将两个数组或者对象进行合并。
+
+	merge: function( first, second ) {
+		var l = second.length,
+			i = first.length,
+			j = 0;
+
+		if ( typeof l === "number" ) {
+			for ( ; j < l; j++ ) {
+				first[ i++ ] = second[ j ];
+			}
+		} else {
+			while ( second[j] !== undefined ) {
+				first[ i++ ] = second[ j++ ];
+			}
+		}
+
+		first.length = i;
+
+		return first;
 	}
