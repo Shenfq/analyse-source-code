@@ -2867,15 +2867,15 @@ function createOptions( options ) {
  * Possible options:
  *
  *	once:			will ensure the callback list can only be fired once (like a Deferred)
- *
+ *				确保这个回调列表只执行（ .fire() ）一次(像一个递延 Deferred).
  *	memory:			will keep track of previous values and will call any callback added
  *					after the list has been fired right away with the latest "memorized"
  *					values (like a Deferred)
- *
+ *				保持以前的值，将添加到这个列表的后面的最新的值立即执行调用任何回调 (像一个递延 Deferred).
  *	unique:			will ensure a callback can only be added once (no duplicate in the list)
- *
+ *				确保一次只能添加一个回调(所以在列表中没有重复的回调).
  *	stopOnFalse:	interrupt callings when a callback returns false
- *
+ *				当一个回调返回false 时中断调用
  */
 jQuery.Callbacks = function( options ) {
 
