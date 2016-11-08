@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script src="../jquery.js"></script>
+	<script>
+		/*
+		var cb0 = $.Callbacks();//默认状态每次fire都会调用全部回调
+		cb0.add(function(val){
+			console.log('cb0:'+val);
+		},function(val){
+			console.log('cb0:'+val*2);
+		});
+		cb0.fire(1);
+		cb0.fire(2);
+
+
+		var cb1 = $.Callbacks('once');//传入once，回调只会被fire一次
+		cb1.add(function(val){
+			console.log('cb1:'+val);
+		});
+		cb1.fire(1);
+		cb1.fire(2);
+
+
+		var cb2 = $.Callbacks('memory');//传入memory，每次add回调都会被激活，且传入的参数与上次fire传入的保持一致
+		cb2.add(function(val){
+			console.log('cb2:'+val);
+		});
+		cb2.fire(1);
+		cb2.add(function(val){
+			val++;
+			console.log('cb2:add'+val);
+		});
+		cb2.add(function(val){
+			val = val+2;
+			console.log('cb2:add'+val);
+		});
+		cb2.fire(0);
+		*/
+
+		var cb3 = $.Callbacks('unique');//传入memory，每次add回调都会被激活，且传入的参数与上次fire传入的保持一致
+		function callback(val) {
+			console.log('cb3:'+val);
+		}
+		cb3.add(callback);
+		cb3.fire(1);
+		cb3.add(callback);
+		cb3.add(callback);
+		cb3.fire(0);
+
+
+		var cb4 = $.Callbacks('stopOnFalse');//stopOnFalse,有回调返回false时后面的回调都不会执行
+		cb4.add(function(val){
+			console.log('cb4:1-'+val);
+			return false;
+		});
+		cb4.add(function(val){
+			console.log('cb4:2-'+val);
+		});
+		cb4.add(function(val){
+			console.log('cb4:3-'+val);
+		});
+		cb4.fire(0);
+	</script>
+</body>
+</html>
