@@ -7,7 +7,6 @@
 <body>
 	<script src="../jquery.js"></script>
 	<script>
-		/*
 		var cb0 = $.Callbacks();//默认状态每次fire都会调用全部回调
 		cb0.add(function(val){
 			console.log('cb0:'+val);
@@ -40,7 +39,7 @@
 			console.log('cb2:add'+val);
 		});
 		cb2.fire(0);
-		*/
+		
 
 		var cb3 = $.Callbacks('unique');//传入memory，每次add回调都会被激活，且传入的参数与上次fire传入的保持一致
 		function callback(val) {
