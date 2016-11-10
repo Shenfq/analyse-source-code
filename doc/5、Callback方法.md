@@ -188,3 +188,32 @@ fire一共定义了两次，一次实在self对象中，在初始化self对象�
 
 
 
+
+
+
+----------
+
+在jQuery中，Callbacks经常用来为异步操作提供支持。
+经常会创建一个 once和memory 类型的Callbacks对象。该对象中的回调只要fire一次，后面添加的回调都会按照第一次fire的参数自动激活，且每次激活完毕后会清空回调队列。
+
+如：
+
+		function fn1(val) {
+			console.log(val);
+		}
+
+    	var Def = $.Callbacks('once memory');
+
+		Def.add( fn1 );
+		Def.fire( "1" );  //1
+	
+		//之后的fire都没有作用，因为每次add都会自动激活且清空回调队列
+		Def.add( fn1 );  //1
+		Def.fire( "2" );
+
+		Def.add( fn1 );  //1
+		Def.fire( "3" );
+
+		Def.add( fn1 );  //1
+		Def.fire( "4" );
+

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+		var def = $.Deferred( );
+		// console.log(def);
+		// console.log(def.promise());
+
+		def.then(function(val){alert(val);return val;}).then(function(val){alert(2*val);return val;}).then(function(val){alert(3*val);return val;});
+		def.resolve(1);
+		def.done(function(val) {console.log(val)});
+		def.resolve(2);
+	</script>
+</body>
+</html>

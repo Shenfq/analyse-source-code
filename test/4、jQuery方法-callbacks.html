@@ -7,6 +7,7 @@
 <body>
 	<script src="../jquery.js"></script>
 	<script>
+		/*
 		var cb0 = $.Callbacks();//默认状态每次fire都会调用全部回调
 		cb0.add(function(val){
 			console.log('cb0:'+val);
@@ -24,7 +25,6 @@
 		cb1.fire(1);
 		cb1.fire(2);
 
-
 		var cb2 = $.Callbacks('memory');//传入memory，每次add回调都会被激活，且传入的参数与上次fire传入的保持一致
 		cb2.add(function(val){
 			console.log('cb2:'+val);
@@ -41,7 +41,7 @@
 		cb2.fire(0);
 		
 
-		var cb3 = $.Callbacks('unique');//传入memory，每次add回调都会被激活，且传入的参数与上次fire传入的保持一致
+		var cb3 = $.Callbacks('unique');//传入unique，重复的回调函数只能被添加一次
 		function callback(val) {
 			console.log('cb3:'+val);
 		}
@@ -64,6 +64,25 @@
 			console.log('cb4:3-'+val);
 		});
 		cb4.fire(0);
+		*/
+
+		//Callbacks对象为Deferred对象提供支持，经常使用once + memory的组合
+		var Def = $.Callbacks('once memory');//这种方式每次回调都只能被fire一次，而且每次添加回调都会被fire，fire之后会清空回调函数队列
+		function fn1(val) {
+			console.log(val);
+		}
+		Def.add( fn1 );
+		Def.fire( "1" );
+
+		Def.add( fn1 );
+		Def.fire( "2" );
+
+		Def.add( fn1 );
+		Def.fire( "3" );
+
+		Def.add( fn1 );
+		Def.fire( "4" );
+
 	</script>
 </body>
 </html>

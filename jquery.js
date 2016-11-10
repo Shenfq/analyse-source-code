@@ -3018,7 +3018,7 @@ jQuery.Callbacks = function( options ) {
 			fireWith: function( context, args ) {   
 				if ( list && ( !fired || stack ) ) {
 					args = args || [];
-					args = [ context, args.slice ? args.slice() : args ];
+					args = [ context, args.slice ? args.slice() : args ];   //args.slice ?
 					if ( firing ) {
 						stack.push( args );
 					} else {
@@ -3043,7 +3043,7 @@ jQuery.Callbacks = function( options ) {
 jQuery.extend({
 
 	Deferred: function( func ) {
-		var tuples = [
+		var tuples = [	//Deferred对象提供了三种状态。成功、失败、进行
 				// action, add listener, listener list, final state
 				[ "resolve", "done", jQuery.Callbacks("once memory"), "resolved" ],
 				[ "reject", "fail", jQuery.Callbacks("once memory"), "rejected" ],
@@ -3051,23 +3051,23 @@ jQuery.extend({
 			],
 			state = "pending",
 			promise = {
-				state: function() {
+				state: function() {  //获取状态
 					return state;
 				},
 				always: function() {
 					deferred.done( arguments ).fail( arguments );
 					return this;
 				},
-				then: function( /* fnDone, fnFail, fnProgress */ ) {
+				then: function( /* fnDone, fnFail, fnProgress */ ) {  //该函数创建了一个新的Deferred对象并返回受限的promise对象
 					var fns = arguments;
 					return jQuery.Deferred(function( newDefer ) {
 						jQuery.each( tuples, function( i, tuple ) {
 							var action = tuple[ 0 ],
 								fn = jQuery.isFunction( fns[ i ] ) && fns[ i ];
-							// deferred[ done | fail | progress ] for forwarding actions to newDefer
+							// deferred[ done | fail | progress ] for forwarding actions to newDefer //deferred[ tuple[1] ]() == $.Callbacks('once memory').add()
 							deferred[ tuple[1] ](function() {
-								var returned = fn && fn.apply( this, arguments );
-								if ( returned && jQuery.isFunction( returned.promise ) ) {
+								var returned = fn && fn.apply( this, arguments );   //激活回调并获取返回值
+								if ( returned && jQuery.isFunction( returned.promise ) ) { //如果回调返回的是一个promise对象
 									returned.promise()
 										.done( newDefer.resolve )
 										.fail( newDefer.reject )
@@ -3080,8 +3080,8 @@ jQuery.extend({
 						fns = null;
 					}).promise();
 				},
-				// Get a promise for this deferred
-				// If obj is provided, the promise aspect is added to the object
+				// Get a promise for this deferred  从deferred对象获得一个promise对象
+				// If obj is provided, the promise aspect is added to the object  如果传入了obj，表示将promise上的方法添加到obj上
 				promise: function( obj ) {
 					return obj != null ? jQuery.extend( obj, promise ) : promise;
 				}
@@ -3091,33 +3091,33 @@ jQuery.extend({
 		// Keep pipe for back-compat
 		promise.pipe = promise.then;
 
-		// Add list-specific methods
+		// Add list-specific methods   遍历之前的状态数组，并添加相应状态的方法
 		jQuery.each( tuples, function( i, tuple ) {
-			var list = tuple[ 2 ],
-				stateString = tuple[ 3 ];
+			var list = tuple[ 2 ],  //list为一个Callbacks对象，且resolve和reject的Callbacks状态为  'once memory'
+				stateString = tuple[ 3 ];  //状态信息。只有成功(done)和失败(fail)才有状态信息
 
-			// promise[ done | fail | progress ] = list.add
+			// promise[ done | fail | progress ] = list.add   Deferred的done和fail方法就是状态为  'once memory' 的Callbacks对象的add方法。
 			promise[ tuple[1] ] = list.add;
 
 			// Handle state
-			if ( stateString ) {
-				list.add(function() {
-					// state = [ resolved | rejected ]
+			if ( stateString ) {//默认为每个结束态添加了三个回调函数
+				list.add(function() {  //这里表示当状态为resolve时，就注销fail上的回调，锁定progress；状态为reject时，注销done上的回调，锁定progress
+					// state = [ resolved | rejected ]   改变状态
 					state = stateString;
 
-				// [ reject_list | resolve_list ].disable; progress_list.lock
+				// [ reject_list | resolve_list ].disable; progress_list.lock     使用了异或方法,  0^1==1   1^1==0
 				}, tuples[ i ^ 1 ][ 2 ].disable, tuples[ 2 ][ 2 ].lock );
 			}
-
+			//扩展了6个方法： resolve | reject | notify  、   resolveWith | rejectWith | notifyWith    就是Callbacks中的fire方法和fireWith方法
 			// deferred[ resolve | reject | notify ]
 			deferred[ tuple[0] ] = function() {
 				deferred[ tuple[0] + "With" ]( this === deferred ? promise : this, arguments );
 				return this;
 			};
-			deferred[ tuple[0] + "With" ] = list.fireWith;
+			deferred[ tuple[0] + "With" ] = list.fireWith;// deferred[ resolveWith | rejectWith | notifyWith ]
 		});
 
-		// Make the deferred a promise
+		// Make the deferred a promise   将promise上的方法扩展到deferred
 		promise.promise( deferred );
 
 		// Call given func if any
