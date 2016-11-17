@@ -85,3 +85,5 @@ class2type、core_deletedIds、core_version就代表三种变量类型，对象�
 但是为什么在调用jQuery时不直接返回一个jQuery对象，还要先返回init的实例，然后让init来继承jQuery的方法呢（我为什么要问这么白痴的问题）？
 
 首先，如果让jQuery返回jQuery的话这样就会形成一个死循环，其次如果返回init实例，init又是jQuery原型下的一个方法，init中的this就是jQuery对象，这样就能轻松的实现链式调用，只要在每个方法中返回this，也就是返回了jQuery对象。
+
+刚开始总会有瑕疵，慢慢加油（我不是鸡汤，认真脸）。
