@@ -3060,12 +3060,12 @@ jQuery.extend({
 				},
 				then: function( /* fnDone, fnFail, fnProgress */ ) {  //该函数创建了一个新的Deferred对象并返回受限的promise对象
 					var fns = arguments;
-					return jQuery.Deferred(function( newDefer ) {
+					return jQuery.Deferred(function( newDefer ) { //此处返回一个新的Def的promise对象，newDefer表示新的Deferred对象
 						jQuery.each( tuples, function( i, tuple ) {
 							var action = tuple[ 0 ],
 								fn = jQuery.isFunction( fns[ i ] ) && fns[ i ];
-							// deferred[ done | fail | progress ] for forwarding actions to newDefer //deferred[ tuple[1] ]() == $.Callbacks('once memory').add()
-							deferred[ tuple[1] ](function() {
+							// 该函数添加到旧deferred对象的callbacks的对调队列，这个函数是沟通新的def对象和旧def对象的桥梁，旧的def对象状态改变时该函数会被调用
+							deferred[ tuple[1] ](function() {  //deferred[ tuple[1] ]()   ===    $.Callbacks('once memory').add()
 								var returned = fn && fn.apply( this, arguments );   //激活回调并获取返回值
 								if ( returned && jQuery.isFunction( returned.promise ) ) { //如果回调返回的是一个promise对象
 									returned.promise()
@@ -3109,7 +3109,7 @@ jQuery.extend({
 				}, tuples[ i ^ 1 ][ 2 ].disable, tuples[ 2 ][ 2 ].lock );
 			}
 			//扩展了6个方法： resolve | reject | notify  、   resolveWith | rejectWith | notifyWith    就是Callbacks中的fire方法和fireWith方法
-			// deferred[ resolve | reject | notify ]
+			// deferred[ resolve | reject | notify ]   	//状态改变后，之后添加的回调都会立即调用
 			deferred[ tuple[0] ] = function() {
 				deferred[ tuple[0] + "With" ]( this === deferred ? promise : this, arguments );
 				return this;

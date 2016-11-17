@@ -131,15 +131,15 @@ promise一共定义了四个方法：
 				jQuery.each( tuples, function( i, tuple ) {
 					var action = tuple[ 0 ],
 						fn = jQuery.isFunction( fns[ i ] ) && fns[ i ];
-					// deferred[ done | fail | progress ] for forwarding actions to newDefer //deferred[ tuple[1] ]() == $.Callbacks('once memory').add()
-					deferred[ tuple[1] ](function() {
+					// 该函数添加到旧deferred对象的callbacks的对调队列，这个函数是沟通新的def对象和旧def对象的桥梁，旧的def对象状态改变时该函数会被调用
+					deferred[ tuple[1] ](function() {//deferred[ tuple[1] ]() ===  $.Callbacks('once memory').add()
 						var returned = fn && fn.apply( this, arguments );   //激活回调并获取返回值
 						if ( returned && jQuery.isFunction( returned.promise ) ) { //如果回调返回的是一个promise对象
 							returned.promise()
 								.done( newDefer.resolve )
 								.fail( newDefer.reject )
 								.progress( newDefer.notify );
-						} else {
+						} else {//如果是一个字符串，将该返回值作为下一个回调的参数进行传递
 							newDefer[ action + "With" ]( this === promise ? newDefer.promise() : this, fn ? [ returned ] : arguments );
 						}
 					});
@@ -153,4 +153,6 @@ promise一共定义了四个方法：
 			return obj != null ? jQuery.extend( obj, promise ) : promise;
 		}
 	}
+
+
 

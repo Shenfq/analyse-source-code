@@ -7,14 +7,41 @@
 <body>
 	<script type="text/javascript" src="../jquery.js"></script>
 	<script type="text/javascript">
+		
 		var def = $.Deferred( );
 		// console.log(def);
 		// console.log(def.promise());
 
-		def.then(function(val){alert(val);return val;}).then(function(val){alert(2*val);return val;}).then(function(val){alert(3*val);return val;});
+		/*def.then(function(val){console.log(val);return 2;})
+		.then(function(val){console.log(val);return 3;})
+		.then(function(val){console.log(val);return 0;});
 		def.resolve(1);
-		def.done(function(val) {console.log(val)});
-		def.resolve(2);
+		//后面两个回调会立即被调用
+		def.done(function(val) {console.log(10*val)});
+		def.then(function(){alert('hasResolve')});*/
+		
+
+		/*var def = $.Deferred( );
+		def.done(function(){alert(1);});
+		def.resolve();
+		def.done(function(){alert(2);});
+		def.done(function(){alert(3);});*/
+
+
+		def.then(function(val){
+			console.log('one then: '+val);  //one then: 1
+			return this;
+		}).then(function(a){
+			console.log(a);  //  1
+			return 2;
+		}).then(function(a){
+			console.log(a);  //  2
+		}).then(function(a){
+			console.log(a);  //  undefined
+		});
+
+		def.resolve(1);
+
 	</script>
 </body>
 </html>
