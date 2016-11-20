@@ -3197,7 +3197,7 @@ jQuery.support = (function( support ) {
 
 	// Support: Safari 5.1, iOS 5.1, Android 4.x, Android 2.3
 	// Check the default checkbox/radio value ("" on old WebKit; "on" elsewhere)
-	support.checkOn = input.value !== "";
+	support.checkOn = input.value !== "";  //检测单选或者多选标签的默认值是否为 'on'
 
 	// Must access the parent to make an option select properly
 	// Support: IE9, IE10
@@ -3219,7 +3219,7 @@ jQuery.support = (function( support ) {
 	support.optDisabled = !opt.disabled;
 
 	// Check if an input maintains its value after becoming a radio
-	// Support: IE9, IE10
+	// Support: IE9, IE10   检测input的value是否能保持，当状态改变后
 	input = document.createElement("input");
 	input.value = "t";
 	input.type = "radio";
@@ -3243,7 +3243,7 @@ jQuery.support = (function( support ) {
 	div.cloneNode( true ).style.backgroundClip = "";
 	support.clearCloneStyle = div.style.backgroundClip === "content-box";
 
-	// Run tests that need a body at doc read
+	// Run tests that need a body at doc read  主要是判断盒模型的种类
 	jQuery(function() {
 		var container, marginDiv,
 			// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).

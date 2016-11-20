@@ -10,6 +10,28 @@
 
 当然我们要做新时代的前端工程师，所以我们看看2.0的support对象就可以了，未来的前端更多应该是实现不同分辨率手机屏幕的适配与ios和android浏览器直接的兼容，而不是还把时间用在如何兼容低版本ie上，那样的时代已经过去，应该好好感谢w3c组织的努力和谷歌浏览器的飞速发展，哈哈哈哈。
 
+	Object{
+			ajax:true,  检测能否创建ajax对象
+			boxSizing:true,
+			boxSizingReliable:true,
+			checkClone:true,检测浏览器能否正确克隆文档片段中的复选框或单选按钮的状态
+			checkOn:true,检测复选框的默认值是否为 on
+			clearCloneStyle:true,
+			cors:true,如果浏览器能创建 XMLHttpRequest 对象，并且该 XMLHttpRequest 对象含有 withCredentials 属性的话，则返回 true。主要是跨域检测
+			focusinBubbles:false,
+			noCloneChecked:true, 如果克隆后的 DOM 元素保持了 .checked 状态，则返回 true。
+			optDisabled:true,如果含有被禁用的 option 元素的 select 元素没有被自动禁用的话，则返回 true。
+			optSelected:true,如果被默认选中的 <option> 元素是通过 selected 属性被选中的，则返回 true。
+			pixelPosition:true,
+			radioValue:true,
+			reliableMarginRight:true
+	}
+
+
+----------
+
+
+
 	jQuery.support = (function( support ) {
 	var input = document.createElement("input"),
 		fragment = document.createDocumentFragment(),
