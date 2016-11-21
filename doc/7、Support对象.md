@@ -12,13 +12,13 @@
 
 	Object{
 			ajax:true,  检测能否创建ajax对象
-			boxSizing:true,
+			boxSizing:true,如果css支持box-sizing属性，则返回true
 			boxSizingReliable:true,
 			checkClone:true,检测浏览器能否正确克隆文档片段中的复选框或单选按钮的状态
 			checkOn:true,检测复选框的默认值是否为 on
-			clearCloneStyle:true,
+			clearCloneStyle:true,如果被克隆节点的样式改变，源节点样式也会改变，返回true
 			cors:true,如果浏览器能创建 XMLHttpRequest 对象，并且该 XMLHttpRequest 对象含有 withCredentials 属性的话，则返回 true。主要是跨域检测
-			focusinBubbles:false,
+			focusinBubbles:false,  如果支持focusin事件被支持，返回true
 			noCloneChecked:true, 如果克隆后的 DOM 元素保持了 .checked 状态，则返回 true。
 			optDisabled:true,如果含有被禁用的 option 元素的 select 元素没有被自动禁用的话，则返回 true。
 			optSelected:true,如果被默认选中的 <option> 元素是通过 selected 属性被选中的，则返回 true。
@@ -28,9 +28,11 @@
 	}
 
 
+	
+
 ----------
 
-
+其实jq的support很少在开发时用到，因为jq提供给我们的方法都做了兼容，我们在使用jq的时候很少会做浏览器兼容，大部分都只在jq内部使用。其实jq做的这些兼容都是小方面，都不是大方面的，而不是常见的改变样式表、添加事件这样的大方向的兼容，所以这一部分源码不会看得那么详细。
 
 	jQuery.support = (function( support ) {
 	var input = document.createElement("input"),
@@ -145,3 +147,8 @@
 	return support;
 	})( {} );
 
+
+
+
+	jQuery.support.cors = !!xhrSupported && ( "withCredentials" in xhrSupported );
+	jQuery.support.ajax = xhrSupported = !!xhrSupported;

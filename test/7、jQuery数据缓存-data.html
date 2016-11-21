@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+
+	<div id="mydiv">aaa</div>
+
+	<script type="text/javascript" src="../jquery.js"></script>
+	<script type="text/javascript">
+		var aa1=$("#mydiv");
+		var aa2=$("#mydiv");
+
+		//=======第一组=========
+		//$('').data()方法
+
+		aa1.data('a',1111);
+		aa2.data('a',2222);
+
+		console.log( aa1.data('a') );  //结果222222
+		console.log( aa2.data('a') );  //结果222222
+
+		//=======第二组=========
+		//$.data()方法
+
+		$.data(aa1,"b","1111");
+		$.data(aa2,"b","2222");
+
+		console.log( $.data(aa1,"b") );   //结果111111
+		console.log( $.data(aa2,"b") );   //结果222222
+	</script>
+</body>
+</html>

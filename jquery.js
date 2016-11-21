@@ -3181,7 +3181,7 @@ jQuery.extend({
 		return deferred.promise();
 	}
 });
-jQuery.support = (function( support ) {
+jQuery.support = (function( support ) { //首先创建一系列的节点，然后查看节点的变现来判断兼容性
 	var input = document.createElement("input"),
 		fragment = document.createDocumentFragment(),
 		div = document.createElement("div"),
@@ -3189,7 +3189,7 @@ jQuery.support = (function( support ) {
 		opt = select.appendChild( document.createElement("option") );
 
 	// Finish early in limited environments
-	if ( !input.type ) {
+	if ( !input.type ) {  //input.type 默认为text ,判断可能input.type为空时直接return
 		return support;
 	}
 
@@ -3201,21 +3201,21 @@ jQuery.support = (function( support ) {
 
 	// Must access the parent to make an option select properly
 	// Support: IE9, IE10
-	support.optSelected = opt.selected;
+	support.optSelected = opt.selected;//判断下拉菜单第一项默认是否被选中，ie9、10默认是不被选中的
 
-	// Will be defined later
+	// Will be defined later 下面三项后面有判断，必须在ready中执行，等dom加载完毕
 	support.reliableMarginRight = true;
 	support.boxSizingReliable = true;
 	support.pixelPosition = false;
 
 	// Make sure checked status is properly cloned
 	// Support: IE9, IE10
-	input.checked = true;
+	input.checked = true;  //判断克隆的复选框是否还是被选中状态
 	support.noCloneChecked = input.cloneNode( true ).checked;
 
 	// Make sure that the options inside disabled selects aren't marked as disabled
 	// (WebKit marks them as disabled)
-	select.disabled = true;
+	select.disabled = true;  //判断select标签禁止后，下面的option标签有没有禁止
 	support.optDisabled = !opt.disabled;
 
 	// Check if an input maintains its value after becoming a radio
@@ -3231,49 +3231,49 @@ jQuery.support = (function( support ) {
 
 	fragment.appendChild( input );
 
-	// Support: Safari 5.1, Android 4.x, Android 2.3
+	// Support: Safari 5.1, Android 4.x, Android 2.3  检测文档对象的克隆
 	// old WebKit doesn't clone checked state correctly in fragments
 	support.checkClone = fragment.cloneNode( true ).cloneNode( true ).lastChild.checked;
 
-	// Support: Firefox, Chrome, Safari
+	// Support: Firefox, Chrome, Safari  判断是否支持focusin事件，只有ie支持，（能冒泡）
 	// Beware of CSP restrictions (https://developer.mozilla.org/en/Security/CSP)
 	support.focusinBubbles = "onfocusin" in window;
 
-	div.style.backgroundClip = "content-box";
+	div.style.backgroundClip = "content-box";//判断节点克隆后，改变克隆节点样式，源节点样式是否会改变
 	div.cloneNode( true ).style.backgroundClip = "";
 	support.clearCloneStyle = div.style.backgroundClip === "content-box";
 
-	// Run tests that need a body at doc read  主要是判断盒模型的种类
+	// Run tests that need a body at doc read  这部分的功能检测需要等待dom加载完毕
 	jQuery(function() {
 		var container, marginDiv,
-			// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).
+			// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).  设置box-sizing为content-box（标准盒模型）
 			divReset = "padding:0;margin:0;border:0;display:block;-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box",
 			body = document.getElementsByTagName("body")[ 0 ];
 
 		if ( !body ) {
-			// Return for frameset docs that don't have a body
+			// Return for frameset docs that don't have a body  如果当前页面没有body，则直接return
 			return;
 		}
 
 		container = document.createElement("div");
 		container.style.cssText = "border:0;width:0;height:0;position:absolute;top:0;left:-9999px;margin-top:1px";
 
-		// Check box-sizing and margin behavior.
+		// Check box-sizing and margin behavior. 检测box-sizing和margin的行为
 		body.appendChild( container ).appendChild( div );
 		div.innerHTML = "";
-		// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).
+		// Support: Firefox, Android 2.3 (Prefixed box-sizing versions).  设置box-sizing为border-box模式，该模式的宽度包括padding和border
 		div.style.cssText = "-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;padding:1px;border:1px;display:block;width:4px;margin-top:1%;position:absolute;top:1%";
 
 		// Workaround failing boxSizing test due to offsetWidth returning wrong value
-		// with some non-1 values of body zoom, ticket #13543
-		jQuery.swap( body, body.style.zoom != null ? { zoom: 1 } : {}, function() {
-			support.boxSizing = div.offsetWidth === 4;
+		// with some non-1 values of body zoom, ticket #13543设置css样式后调用一个回调，完成后再变回之前的样式
+		jQuery.swap( body, body.style.zoom != null ? { zoom: 1 } : {}, function() { //zoom控制元素的缩放比例
+			support.boxSizing = div.offsetWidth === 4; //如果css支持box-sizing属性，则返回true
 		});
 
 		// Use window.getComputedStyle because jsdom on node.js will break without it.
 		if ( window.getComputedStyle ) {
-			support.pixelPosition = ( window.getComputedStyle( div, null ) || {} ).top !== "1%";
-			support.boxSizingReliable = ( window.getComputedStyle( div, null ) || { width: "4px" } ).width === "4px";
+			support.pixelPosition = ( window.getComputedStyle( div, null ) || {} ).top !== "1%"; //判断浏览器是否能将偏移的百分比转化为像素值
+			support.boxSizingReliable = ( window.getComputedStyle( div, null ) || { width: "4px" } ).width === "4px"; //ie下border-box状态返回宽度会减掉padding
 
 			// Support: Android 2.3
 			// Check if div with explicit width and no margin-right incorrectly
@@ -3284,7 +3284,7 @@ jQuery.support = (function( support ) {
 			marginDiv.style.marginRight = marginDiv.style.width = "0";
 			div.style.width = "1px";
 
-			support.reliableMarginRight =
+			support.reliableMarginRight =  //判断margin-right是否等于0，老版本webkit在改变父标签的width后会影响其margin-right的值
 				!parseFloat( ( window.getComputedStyle( marginDiv, null ) || {} ).marginRight );
 		}
 
