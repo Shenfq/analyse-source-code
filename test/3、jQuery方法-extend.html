@@ -7,16 +7,25 @@
 <body>
 	<script src="../jquery.js"></script>
 	<script>
-		// var target = {a:['x','y']},
-		// 	obj1 = {a:['a','b','c'],b:22};
-		// $.extend( true, target, obj1 );
-		// console.log(target);
 
+		var obj = {0:0};
+		$.extend(obj, {a:1,b:2,c:3});
+		console.log(obj);
+
+		/*var target = {a:['x','y']},
+			obj1 = {a:['a','b','c'],b:22};
+		$.extend( true, target, obj1 );
+		console.log(target);*/
+
+		/*
 		var target = {a:{name1:'x'}},
 			obj1 = {a:{name2:'u'},b:22};
 		var test1 = $.extend( target, obj1 );
 		//var test2 = $.extend( true, target, obj1 );
 		console.log(test1);
+		*/
+
+		
 	</script>
 </body>
 </html>

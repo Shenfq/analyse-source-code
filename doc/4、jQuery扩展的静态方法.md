@@ -102,6 +102,23 @@ isWindow只需要判断传入的对象是否有window属性等于本身就可以
 		return obj != null && obj === obj.window;
 	}
 
+----------
+
+下面看看camelCase方法，将传入的字符串转换成驼峰命名法
+
+	var rmsPrefix = /^-ms-/,
+		rdashAlpha = /-([\da-z])/gi,
+		// Used by jQuery.camelCase as callback to replace()
+		fcamelCase = function( all, letter ) {//该函数是camelCase最后replace的回调函数。
+			//all表示rdashAlpha匹配到的字符串，letter表示第一个匹配子项
+			//该函数的返回值表示将匹配字符串替换为返回的字符串，返回值将匹配子项转换成大写
+			return letter.toUpperCase();
+		}
+
+	var camelCase = function( string ) {//转成驼峰命名法
+		//在转换之前先把-ms-转换成了ms-
+		return string.replace( rmsPrefix, "ms-" ).replace( rdashAlpha, fcamelCase );
+	}
 
 ----------
 
