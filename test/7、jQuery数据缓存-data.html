@@ -6,27 +6,30 @@
 </head>
 <body>
 
-	<div id="mydiv1">aaa</div>
+	<div id="mydiv1" class="test" data-a="aaa">aaa</div>
 	<div id="mydiv2">bbb</div>
 	<div id="mydiv3">ccc</div>
 
 	<script type="text/javascript" src="../jquery.js"></script>
 	<script type="text/javascript">
-		/*
-		var aa1=$("#mydiv");
-		var aa2=$("#mydiv");
+		
+		var aa1=$("#mydiv1");
+		var aa2=$("#mydiv1");
 
 		//=======第一组=========
 		//$('').data()方法
+		////该方法将缓存标识放在$对象下的第一个DOM对象上，aa1和aa2获取的是同一个DOM对象，所以缓存数据位置一样
 
 		aa1.data('a',1111);
 		aa2.data('a',2222);
 
+		console.log({1:aa1,2:aa2});
 		console.log( aa1.data('a') );  //结果222222
 		console.log( aa2.data('a') );  //结果222222
-
+		/*
 		//=======第二组=========
 		//$.data()方法
+		//该方法将缓存标识放在对象上，aa1和aa2是不同对象，所以缓存数据位置不一样
 
 		$.data(aa1,"b","1111");
 		$.data(aa2,"b","2222");
@@ -50,10 +53,12 @@
 		console.log($.data(div1)); //当不指定key时，将返回当前对象下缓存的所有数据
 		*/
 
+		/*
 		var obj = {a:1};
 		$.data(obj,'key1','aaa');
 		$.data(obj,'key2','bbb');
 		console.log( $.data(obj) );
+		*/
 	</script>
 </body>
 </html>

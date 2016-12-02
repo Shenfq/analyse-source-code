@@ -737,16 +737,16 @@ jQuery.extend({
 		return proxy;
 	},
 
-	// Multifunctional method to get and set values of a collection
-	// The value/s can optionally be executed if it's a function
+	// Multifunctional method to get and set values of a collection   可以为集合中的元素设置一个或多个属性值，
+	// The value/s can optionally be executed if it's a function      或者读取第一个元素的属性值。
 	access: function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		var i = 0,
 			length = elems.length,
-			bulk = key == null;
+			bulk = key == null; //判断key是否为空
 
 		// Sets many values
-		if ( jQuery.type( key ) === "object" ) {
-			chainable = true;
+		if ( jQuery.type( key ) === "object" ) {//如果key为一个对象，遍历该对象，循环调用access
+			chainable = true;//如果是set操作置为true，get操作为false
 			for ( i in key ) {
 				jQuery.access( elems, fn, i, key[i], true, emptyGet, raw );
 			}
@@ -761,7 +761,7 @@ jQuery.extend({
 
 			if ( bulk ) {
 				// Bulk operations run against the entire set
-				if ( raw ) {
+				if ( raw ) {//当value不为一个函数时，将value作为参数传递给回调，或者传入了raw为true
 					fn.call( elems, value );
 					fn = null;
 
@@ -775,7 +775,7 @@ jQuery.extend({
 			}
 
 			if ( fn ) {
-				for ( ; i < length; i++ ) {
+				for ( ; i < length; i++ ) {//遍历elems对象
 					fn( elems[i], key, raw ? value : value.call( elems[i], i, fn( elems[i], key ) ) );
 				}
 			}
@@ -3480,9 +3480,9 @@ Data.prototype = {
 			}
 		}
 	},
-	hasData: function( owner ) {
+	hasData: function( owner ) { //判断当前对象是否有缓存对象
 		return !jQuery.isEmptyObject(
-			this.cache[ owner[ this.expando ] ] || {}
+			this.cache[ owner[ this.expando ] ] || {}  //先判断该对象是否有缓存标记，有的话再看cache上该属性是不是空对象
 		);
 	},
 	discard: function( owner ) { //清空当前对象下的缓存，如果有的话
@@ -3497,7 +3497,7 @@ data_user = new Data(); //该对象实例提供给jquery对象外部使用
 data_priv = new Data();	//该对象实例提供给jquery对象内部使用
 //下面这些方法又是对Data对象的进一步抽象，并将抽象后的方法扩展的jQuery对象和jQuery实例上。
 
-jQuery.extend({  //下面几个方法扩展到jQuery对象下
+jQuery.extend({  //下面几个方法扩展到jQuery对象下，主要是对Data原型下方法的调用，没有进一步抽象
 	acceptData: Data.accepts,
 
 	hasData: function( elem ) {
@@ -3511,7 +3511,7 @@ jQuery.extend({  //下面几个方法扩展到jQuery对象下
 	removeData: function( elem, name ) {
 		data_user.remove( elem, name );
 	},
-	//这两个方法现在就是调用data_priv下的方法，与data和removeData没有区别，现在可以弃用
+	//这两个方法现在就是调用data_priv下的方法，现在不建议使用
 	// TODO: Now that all calls to _data and _removeData have been replaced
 	// with direct calls to data_priv methods, these can be deprecated.
 	_data: function( elem, name, data ) {
@@ -3523,17 +3523,17 @@ jQuery.extend({  //下面几个方法扩展到jQuery对象下
 	}
 });
 
-jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下
+jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Data原型下的get和set方法进一步抽象
 	data: function( key, value ) {
 		var attrs, name,
-			elem = this[ 0 ],
+			elem = this[ 0 ],//elem表示当前$对象下的第一个dom对象
 			i = 0,
 			data = null;
 
-		// Gets all values
+		// Gets all values  如果key不存在获取所有缓存数据
 		if ( key === undefined ) {
 			if ( this.length ) {
-				data = data_user.get( elem );
+				data = data_user.get( elem );  //获取当前elem下的所有缓存数据
 
 				if ( elem.nodeType === 1 && !data_priv.get( elem, "hasDataAttrs" ) ) {
 					attrs = elem.attributes;
@@ -3553,22 +3553,22 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下
 		}
 
 		// Sets multiple values
-		if ( typeof key === "object" ) {
+		if ( typeof key === "object" ) {	//如果key为对象，遍历节点对象，并调用set方法
 			return this.each(function() {
 				data_user.set( this, key );
 			});
 		}
-
+		//key存在且不是一个对象时
 		return jQuery.access( this, function( value ) {
 			var data,
-				camelKey = jQuery.camelCase( key );
+				camelKey = jQuery.camelCase( key );//获取当前key的驼峰表示
 
 			// The calling jQuery object (element matches) is not empty
 			// (and therefore has an element appears at this[ 0 ]) and the
 			// `value` parameter was not undefined. An empty jQuery object
 			// will result in `undefined` for elem = this[ 0 ] which will
 			// throw an exception if an attempt to read a data cache is made.
-			if ( elem && value === undefined ) {
+			if ( elem && value === undefined ) {//当value为undefined时，为获取当前节点key的缓存值
 				// Attempt to get data from the cache
 				// with the key as-is
 				data = data_user.get( elem, key );
@@ -3594,8 +3594,8 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下
 				return;
 			}
 
-			// Set the data...
-			this.each(function() {
+			// Set the data... 
+			this.each(function() {  //给当前jQuery对象下的每个节点都缓存数据
 				// First, attempt to store a copy or reference of any
 				// data that might've been store with a camelCased key.
 				var data = data_user.get( this, camelKey );
@@ -3615,7 +3615,7 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下
 		}, null, value, arguments.length > 1, null, true );
 	},
 
-	removeData: function( key ) {
+	removeData: function( key ) {//移除缓存
 		return this.each(function() {
 			data_user.remove( this, key );
 		});

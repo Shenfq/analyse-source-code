@@ -53,9 +53,9 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 	
 		proxy: 
 
-		access: 
+		access: 为集合中的元素设置一个或多个属性值，或者获取第一个元素的属性值
 
-		now: 
+		now: 获取当前时间戳
 	
 		swap: 
 	});
