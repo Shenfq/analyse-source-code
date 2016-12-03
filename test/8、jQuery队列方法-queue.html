@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		.box{
+			width: 100px;
+			height: 100px;
+			background-color: red;
+			position:relative;
+			top:0;
+		}
+	</style>
+</head>
+<body>
+	<div class="box" id="box1"></div>
+	<div class="box" id="box2"></div>
+
+	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			var box1 = $('#box1');
+			var box2 = $('#box2');
+			var FUNC=[
+				function() {box1.animate({width:'200'},aniCB);},
+				function() {box2.animate({width:'500'},aniCB);},
+				function() {box1.animate({height:'300'},aniCB);},
+				function() {box2.animate({left:'400'},aniCB);},
+				function() {box1.animate({left:'200'},aniCB);},
+				function() {alert('动画结束')}
+			];
+
+			var aniCB=function() {
+				$.dequeue(document ,'myAnimation');
+			}
+			$.queue(document, 'myAnimation',FUNC);
+			aniCB();
+
+			
+
+		});
+		
+	</script>
+</body>
+</html>
