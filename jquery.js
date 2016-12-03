@@ -3405,7 +3405,7 @@ Data.prototype = {
 		// empty data object. A valid owner object must be provided.
 		var cache = this.cache[ this.key( owner ) ];  //先获取该对象上的全部缓存数据，然后看key是否存在
 
-		return key === undefined ?  //key未undefined则返回全部缓存数据，如果存在就返回要找的key存储的数据
+		return key === undefined ?  //key不存在则返回全部缓存数据，如果存在就返回要找的key存储的数据
 			cache : cache[ key ];
 	},
 	access: function( owner, key, value ) {  //该方法是对get方法与set方法的抽象
