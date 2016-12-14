@@ -3651,16 +3651,16 @@ function dataAttr( elem, key, data ) {
 	return data;
 }
 jQuery.extend({
-	queue: function( elem, type, data ) {
+	queue: function( elem, type, data ) {//创建一个函数队列，队列缓存通过data方法在elem上，type为该队列的名字，默认为'fx'
 		var queue;
 
 		if ( elem ) {
 			type = ( type || "fx" ) + "queue";
-			queue = data_priv.get( elem, type );
+			queue = data_priv.get( elem, type );//先获取当前对象下缓存的队列
 
 			// Speed up dequeue by getting out quickly if this is just a lookup
 			if ( data ) {
-				if ( !queue || jQuery.isArray( data ) ) {
+				if ( !queue || jQuery.isArray( data ) ) {  //如果queue没有缓存过数据，缓存队列，如果data是数组则会把之前的覆盖掉
 					queue = data_priv.access( elem, type, jQuery.makeArray(data) );
 				} else {
 					queue.push( data );
@@ -3673,10 +3673,10 @@ jQuery.extend({
 	dequeue: function( elem, type ) {
 		type = type || "fx";
 
-		var queue = jQuery.queue( elem, type ),
+		var queue = jQuery.queue( elem, type ), //先获取队列
 			startLength = queue.length,
-			fn = queue.shift(),
-			hooks = jQuery._queueHooks( elem, type ),
+			fn = queue.shift(),//找到队列的第一个函数
+			hooks = jQuery._queueHooks( elem, type ), //钩子
 			next = function() {
 				jQuery.dequeue( elem, type );
 			};
@@ -3690,7 +3690,7 @@ jQuery.extend({
 		if ( fn ) {
 
 			// Add a progress sentinel to prevent the fx queue from being
-			// automatically dequeued
+			// automatically dequeued   让animation队列添加后能自动出队
 			if ( type === "fx" ) {
 				queue.unshift( "inprogress" );
 			}
@@ -3701,12 +3701,12 @@ jQuery.extend({
 		}
 
 		if ( !startLength && hooks ) {
-			hooks.empty.fire();
+			hooks.empty.fire();//清空队列
 		}
 	},
 
 	// not intended for public consumption - generates a queueHooks object, or returns the current one
-	_queueHooks: function( elem, type ) {
+	_queueHooks: function( elem, type ) {//添加一个回调方法，当队列回调全部调用完毕后，清空队列
 		var key = type + "queueHooks";
 		return data_priv.get( elem, key ) || data_priv.access( elem, key, {
 			empty: jQuery.Callbacks("once memory").add(function() {
@@ -3722,35 +3722,35 @@ jQuery.fn.extend({
 
 		if ( typeof type !== "string" ) {
 			data = type;
-			type = "fx";
+			type = "fx";	//默认type为fx
 			setter--;
 		}
 
-		if ( arguments.length < setter ) {
+		if ( arguments.length < setter ) {//获取已缓存的队列
 			return jQuery.queue( this[0], type );
 		}
 
 		return data === undefined ?
-			this :
-			this.each(function() {
-				var queue = jQuery.queue( this, type, data );
+			this :   //遍历匹配元素，在每一个元素上都执行入队操作
+			this.each(function() {  //在jQuery中，使用each遍历匹配的元素，是一种安全的惯例做法
+				var queue = jQuery.queue( this, type, data );//通过调用jQuery.queue()将回调缓存到队列中
 
 				// ensure a hooks for this queue
-				jQuery._queueHooks( this, type );
+				jQuery._queueHooks( this, type );//调用钩子函数
 
 				if ( type === "fx" && queue[0] !== "inprogress" ) {
-					jQuery.dequeue( this, type );
+					jQuery.dequeue( this, type );//添加缓存队列后，自动出队，为animation函数提供方便
 				}
 			});
 	},
 	dequeue: function( type ) {
 		return this.each(function() {
-			jQuery.dequeue( this, type );
+			jQuery.dequeue( this, type );//出队
 		});
 	},
 	// Based off of the plugin by Clint Helfers, with permission.
 	// http://blindsignals.com/index.php/2009/07/jquery-delay/
-	delay: function( time, type ) {
+	delay: function( time, type ) {//延迟执行队列中未执行的函数
 		time = jQuery.fx ? jQuery.fx.speeds[ time ] || time : time;
 		type = type || "fx";
 
@@ -3761,12 +3761,12 @@ jQuery.fn.extend({
 			};
 		});
 	},
-	clearQueue: function( type ) {
+	clearQueue: function( type ) {//清空队列
 		return this.queue( type || "fx", [] );
 	},
 	// Get a promise resolved when queues of a certain type
 	// are emptied (fx is the type by default)
-	promise: function( type, obj ) {
+	promise: function( type, obj ) {// 返回一个只读视图，当队列中指定类型的函数执行完毕后
 		var tmp,
 			count = 1,
 			defer = jQuery.Deferred(),
