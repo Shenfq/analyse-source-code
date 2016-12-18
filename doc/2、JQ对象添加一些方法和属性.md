@@ -39,38 +39,61 @@
     	splice: [].splice  //存储了数组的splice方法
     ｝
 
-上面是对jQuery初始化的一些方法和属性的介绍，这里主要看下init是如何实现，其余的方法在具体用到的时候再看。
+上面是对jQuery初始化的一些方法和属性的介绍，前面初始化jQuery对象时，我们可以看到jQuery对象其实是一个实例化的jQuery.fn.init，所以这里主要看下init是如何实现，其余的方法在具体用到的时候再看。
 
 首先可以观察到init方法传入了三个参数：
+
+	init: function( selector, context, rootjQuery ) {...}
+
 1. selector(选择器)
 2. context(上下文环境)
-3. rootJQuery( $(document) ) 参见886行
+3. rootJQuery( $(document) ) 
 
-init对传入的选择器进行了一下的区分：
 
-1. 空 ： 包括 '' false undefined null
+	rootjQuery = jQuery(document);//参见866行
 
-	return false;
 
-2. string：这个内容有点多，会在后面详细的介绍。<br/><br/>
+init对传入的选择器进行了以下的区分：
+
+- 空 ： 包括 '' false undefined null
+
+
+	if ( !selector ) {return this;}
+
+
+- string：这个部分判断有点复杂，会在后面详细的介绍。
+
 	
-3. DOM节点：修改jQuery对象的属性 0：selector，length：1  ；这就相当于把jQuery对象转成了一个类数组，最后返回this，可用于链式调用。
+	if ( typeof selector === "string" )...
 
+	
+- DOM节点：修改jQuery对象的属性 0：selector，length：1  ；这就相当于把jQuery对象转成了一个类数组，最后返回this，可用于链式调用。
+
+	
+	if ( selector.nodeType ){//通过判断该变量是否有nodeType属性来确定是不是一个DOM节点
     this.context = this[0] = selector;
     this.length = 1;
-    return this;
-    
-4. Function：  $(fn) 就相当于 $(document).ready(fn)
-    
-	return rootjQuery.ready( selector );
+    return this;}
 
-5. jQuery对象：
 
+- Function：  $(fn) 就相当于 $(document).ready(fn)
+
+
+
+	if ( jQuery.isFunction( selector ){//jquery内部用来判断一个对象是不是一个函数的方法
+	return rootjQuery.ready( selector );}
+
+
+- jQuery对象：
+
+
+	if ( selector.selector !== undefined ) {//如果改变了有select属性则认为该变量是jQ变量
 	this.selector = selector.selector;
 	this.context = selector.context;
-	return jQuery.makeArray( selector, this );
+	return jQuery.makeArray( selector, this );}
 
-6. 其他任意类型的值：将传入的数据转换成一个数组
+- 其他任意类型的值：将传入的变量和jQuery对象合并成一个数组
+
 
 	return jQuery.makeArray( selector, this );
 
@@ -126,10 +149,13 @@ exec方法用于正则匹配，返回一个数组，第一个元素是匹配到�
 	// ["#id", undefined, "id"]
 
 
-现在我们知道了，match其实就是存储了字符串含义的数组，不得不感叹这是人想出来的吗。
+现在我们知道了，match其实就是存储了字符串含义的数组，不得不感叹这是人想出来的吗。正则懵逼。
 
 - 如果match[1]存在就代表是html标签
 - 如果match[2]存在就代表是id名
+- 如果两种情况都没有匹配到的话，表示这是一个复杂选择器，具体的实现是jQuery内部的Sizzle方法来实现，这个方法有两千行左右，可谓是jQuery的核心，而且jQuery把这个方法也当成了一个单独的库，如果觉得jQuery太大，只会用到选择器部分的功能，感兴趣的话可以在[Sizzle官网](http://sizzlejs.com/)  下载
+
+
 
 
 可以看到我们平时调用 $() 的时候很爽，又能当选择器又能创节点，但是不知道这后面的实现方法原来这么复杂，还真是用起来越方便的东西实现越复杂。
@@ -138,4 +164,4 @@ exec方法用于正则匹配，返回一个数组，第一个元素是匹配到�
 
 ----------
 
-恩，楼上说的对 ✌
+恩，楼上说的对 -。-
