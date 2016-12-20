@@ -15,21 +15,19 @@
 </head>
 <body>
 	<div class="box" id="box1"></div>
-	<div class="box" id="box2"></div>
 
 	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
 	<script type="text/javascript">
 
-		
+		/*
 		$(function(){
 
 			var box1 = $('#box1');
-			var box2 = $('#box2');
 			var FUNC=[
 				function() {box1.animate({width:'200'},aniCB);},
-				function() {box2.animate({width:'500'},aniCB);},
+				function() {box1.animate({width:'500'},aniCB);},
 				function() {box1.animate({height:'300'},aniCB);},
-				function() {box2.animate({left:'400'},aniCB);},
+				function() {box1.animate({left:'400'},aniCB);},
 				function() {box1.animate({left:'200'},aniCB);},
 				function() {alert('动画结束')}
 			];
@@ -41,6 +39,20 @@
 			aniCB();
 
 		});
+		*/
+
+		$(function() {
+			var box1 = $('#box1');
+			box1.click(function() {
+				$(this).animate({width: 300},800)
+					.animate({left: 200},800);
+
+				$(this).promise().done(function() {
+					alert('has done');
+				});
+			});
+		});
+
 		
 	</script>
 </body>

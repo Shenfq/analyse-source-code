@@ -47,4 +47,4 @@ $.dequeue(elem, type)，该方法接受两个参数：
 
 
 
-后面jQuery又通过$.fn.extend把queue和dequeue又一次扩展到了实例方法下，
+后面jQuery又通过$.fn.extend把queue和dequeue又一次扩展到了实例方法下，就像之前的data一样，jQuery即拓展了data的静态方法又拓展了data的实例方法。其实在实际情况中，我们通常只会使用到jQuery的实例方法，其静态方法其实是为实例方法提供支持的，毕竟jQuery是一个DOM操作为主的库。再让我们来看看实例方法下的queue与静态方法下的queue有什么区别。

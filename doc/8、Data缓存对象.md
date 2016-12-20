@@ -13,10 +13,10 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 下面简单看看这个对象的构造
 
 	function Data(){  //构造函数
-		//该对象下只有一个属性，这个属性是一个随机字符串，是沟通cache对象与指定缓存对象的一座桥梁
+		//该对象下只有一个属性，这个属性是一个随机字符串，是打通cache对象与指定缓存对象的一座桥梁
 		this.expando = jQuery.expando + Math.random();  //生成一个唯一字符串
 	}
-
+	Data.uid = 1;  //uid 从1开始，表示当前cache对象中的属性名
 	Data.accepts = function(owner){
 		//该方法是用来判断传入的对象是否具有缓存数据的能力
 		//只有简简单单的一句代码，判断出了两种情况：
@@ -65,8 +65,38 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 
 这里重点介绍如下几个方法：
 
-首先是Data原型下的set、get、access
-	
+首先是Data原型下的key、set、get、access
+
+	key: function( owner ) {
+		if ( !Data.accepts( owner ) ) {  //如果该对象不能满足Data.accepts条件则return 0，直接跳出
+			return 0;
+		}
+		var descriptor = {},
+			unlock = owner[ this.expando ];  //检测这个对象是否已经存在缓存键
+
+		// If not, create one
+		if ( !unlock ) {  //如果没有被缓存过数据，创建key
+			unlock = Data.uid++;
+			//此处为了兼容性，如果有defineProperties方法，就是用该方法将expando属性扩展到owner对象，没有这是要jQuery定义的extend
+			try {
+				descriptor[ this.expando ] = { value: unlock };
+				Object.defineProperties( owner, descriptor );
+			} catch ( e ) {
+				descriptor[ this.expando ] = unlock;
+				jQuery.extend( owner, descriptor );
+			}
+			//有人觉得这样做会多此一举，直接用extend扩展就可以。这里jQuery这样做的目的是为了让owner对象上的expando属性只可读，不可写。
+			//也就是所如果使用Object.defineProperties方法进行扩展，就算用户不小心修改了expando的值也没关系，因为该属性不能被修改。
+			//因为Android4.0以下版本的浏览器不支持defineProperties方法进行扩展，所有使用extend方法扩展的属性但是很容易被修改，这是不安全的。
+		}
+
+		// 给cache对象下创建一个用来缓存属性的新对象。并且属性名为owner对象下expando属性的值，让expando成为打通cache和owner之前的桥梁。
+		if ( !this.cache[ unlock ] ) {
+			this.cache[ unlock ] = {};
+		}
+
+		return unlock;  //最后返回缓存键的键值
+	},
 	set: function( owner, data, value ) {
 		var prop,
 			unlock = this.key( owner ),  //获取缓存键值，没有则设置一个缓存键并将值返回
@@ -112,5 +142,15 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 	});
 
 我们能看出其实data方法就是Data.prototype下的access方法。
+
+了解了静态方法下的data后，我们在看看实例方法下的data方法，也就是通过jQuery.fn.extend扩展的data。在jQuery中很多方法都会扩展两次，一次是扩展在jQuery对象上，还一次就是扩展在jQuery的原型对象上。我们都知道jQuery是一个以DOM操作为主的库，所以我们很多时候是使用的实例方法，而且还能在一个jQuery对象上进行链式调用。jQuery中的静态方法其实是在内部提供给实例方法使用的，实例方法则是对静态方法的进一步抽象，不信你接下来看看jQuery.fn.data是不是比jQuery.data复杂的多。
+
+
+
+
+
+
+
+----------
 
 到这里我们就已经基本了解了缓存对象主要用来干嘛以及其工作原理，还有一部分源码没有深入研究。说说题外话，最近学起来也有点迷茫，发现前端框架越来越多，也越来越好用，自己是否还有必要坚持jQuery的深入。虽然说jQuery的使用越来越少而且与主流框架的理念有些格格不入了，但jQuery还是小项目的有力支撑。既然开始了就先把开始的事坚持到底吧。

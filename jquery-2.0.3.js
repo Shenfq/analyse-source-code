@@ -3745,7 +3745,7 @@ jQuery.fn.extend({
 	},
 	dequeue: function( type ) {
 		return this.each(function() {
-			jQuery.dequeue( this, type );//出队
+			jQuery.dequeue( this, type );//调用工具方法的dequue进行出队
 		});
 	},
 	// Based off of the plugin by Clint Helfers, with permission.
@@ -3755,7 +3755,7 @@ jQuery.fn.extend({
 		type = type || "fx";
 
 		return this.queue( type, function( next, hooks ) {
-			var timeout = setTimeout( next, time );
+			var timeout = setTimeout( next, time );//其实就是调用setTimeout进行延迟，时间结束后调用next
 			hooks.stop = function() {
 				clearTimeout( timeout );
 			};
