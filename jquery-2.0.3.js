@@ -3700,15 +3700,15 @@ jQuery.extend({
 			fn.call( elem, next, hooks );
 		}
 
-		if ( !startLength && hooks ) {
+		if ( !startLength && hooks ) {//如果该函数是队列的最后一个函数，调用hook.empty
 			hooks.empty.fire();//清空队列
 		}
 	},
 
 	// not intended for public consumption - generates a queueHooks object, or returns the current one
-	_queueHooks: function( elem, type ) {//添加一个回调方法，当队列回调全部调用完毕后，清空队列
+	_queueHooks: function( elem, type ) {//添加一个回调方法，该回调只能被执行一次，当队列回调全部调用完毕后，清空队列
 		var key = type + "queueHooks";
-		return data_priv.get( elem, key ) || data_priv.access( elem, key, {
+		return data_priv.get( elem, key ) || data_priv.access( elem, key, {//如果已经添加该方法则直接返回，不重复添加
 			empty: jQuery.Callbacks("once memory").add(function() {
 				data_priv.remove( elem, [ type + "queue", key ] );
 			})

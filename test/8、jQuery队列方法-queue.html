@@ -18,36 +18,56 @@
 
 	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
 	<script type="text/javascript">
+		/*		
+		var $box = $('#box1');
+		$.queue($box,null,function(a){
+			alert(1);
+		});
+		$.queue($box,null,function(b){
+			alert(2);
+		});
+		console.log( $.queue($box) );
 
+		$.queue($box,null,[function(c){
+			alert(3);
+		},function(d){
+			alert(4);
+		}]);
+		console.log( $.queue($box) );//如果传入的是函数数组会将之前的队列覆盖
+
+		$.dequeue($box);
+		$.dequeue($box);
+		*/
 		/*
 		$(function(){
 
 			var box1 = $('#box1');
 			var FUNC=[
-				function() {box1.animate({width:'200'},aniCB);},
-				function() {box1.animate({width:'500'},aniCB);},
-				function() {box1.animate({height:'300'},aniCB);},
-				function() {box1.animate({left:'400'},aniCB);},
-				function() {box1.animate({left:'200'},aniCB);},
-				function() {alert('动画结束')}
+				function(next) {box1.animate({width:'200'},next);},
+				function(next) {box1.animate({width:'500'},next);},
+				function(next) {box1.animate({height:'300'},next);},
+				function(next) {box1.animate({left:'400'},next);},
+				function(next) {box1.animate({left:'200'},next);},
+				function(next) {alert('动画结束')}
 			];
 
-			var aniCB=function() {
-				$.dequeue(document ,'myAnimation');
-			}
 			$.queue(document, 'myAnimation',FUNC);
-			aniCB();
-
+			$.dequeue(document ,'myAnimation');
 		});
 		*/
+
+		
 
 		$(function() {
 			var box1 = $('#box1');
 			box1.click(function() {
 				$(this).animate({width: 300},800)
-					.animate({left: 200},800);
-
-				$(this).promise().done(function() {
+				.queue(function(next) {
+					$(this).css('background-color','blue');
+					next();
+				})
+				.animate({left: 200},800)
+				.promise().done(function() {
 					alert('has done');
 				});
 			});

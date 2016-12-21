@@ -131,6 +131,36 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 		}
 		this.set( owner, key, value );
 		return value !== undefined ? value : key; //最后返回缓存的数据
+	},
+	remove: function( owner, key ) {
+		var i, name, camel,
+			unlock = this.key( owner ),//获取当前对象在cache上的属性名
+			cache = this.cache[ unlock ];//获取该对象缓存的全部数据
+
+		if ( key === undefined ) {//如果不指定要删除的key名，则会将当前缓存对象置空
+			this.cache[ unlock ] = {};
+
+		} else {
+			//如果有key时：
+			if ( jQuery.isArray( key ) ) {  //先判断是不是数组
+				//如果是数组，将当前数组所有key和key的驼峰表示法合并到一个数组
+				name = key.concat( key.map( jQuery.camelCase ) );
+			} else {//不为数组的情况
+				camel = jQuery.camelCase( key ); //获取key的驼峰表示法
+				if ( key in cache ) { //key属性存在于cache，则将key和camel合并到一个数组
+					name = [ key, camel ];
+				} else {//key属性不存在于cache，再判断camel属性是否存在于cache。
+					name = camel;
+					name = name in cache ?
+						[ name ] : ( name.match( core_rnotwhite ) || [] );
+				}
+			}
+
+			i = name.length;//遍历之前合并的key数组，将cache下的key属性全部删除
+			while ( i-- ) {
+				delete cache[ name[ i ] ];
+			}
+		}
 	}
 
 理解上面三个方法后，再看看jQuery扩展的几个方法就一目了然，其实就是调用了Data原型下的几个方法。
