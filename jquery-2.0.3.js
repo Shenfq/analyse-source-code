@@ -3387,7 +3387,7 @@ Data.prototype = {
 		// Handle: [ owner, { properties } ] args
 		} else { //如果data是一个对象，表示要添加多个属性到缓存对象上
 			// Fresh assignments by object are shallow copied
-			if ( jQuery.isEmptyObject( cache ) ) {//判断当前cache是否为空，如果为空使用extend，不为空使用forin遍历添加
+			if ( jQuery.isEmptyObject( cache ) ) {//判断当前cache是否为空，如果为空使用extend（浅复制），不为空使用forin遍历添加
 				jQuery.extend( this.cache[ unlock ], data );
 			// Otherwise, copy the properties one-by-one to the cache object
 			} else { 
@@ -3530,22 +3530,22 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Da
 			i = 0,
 			data = null;
 
-		// Gets all values  如果key不存在获取所有缓存数据
+		// Gets all values  如果key不存在获取elem所有缓存数据
 		if ( key === undefined ) {
 			if ( this.length ) {
 				data = data_user.get( elem );  //获取当前elem下的所有缓存数据
 
 				if ( elem.nodeType === 1 && !data_priv.get( elem, "hasDataAttrs" ) ) {
-					attrs = elem.attributes;
+					attrs = elem.attributes;//获取elem下面所有的属性
 					for ( ; i < attrs.length; i++ ) {
-						name = attrs[ i ].name;
+						name = attrs[ i ].name;//获取属性名
 
-						if ( name.indexOf( "data-" ) === 0 ) {
+						if ( name.indexOf( "data-" ) === 0 ) {//判断是不是html5的自定义属性data-*
 							name = jQuery.camelCase( name.slice(5) );
-							dataAttr( elem, name, data[ name ] );
+							dataAttr( elem, name, data[ name ] );//如果data[name]是undefined，就将该属性及其值缓存到cache对象上，该方法在（3625行）
 						}
 					}
-					data_priv.set( elem, "hasDataAttrs", true );
+					data_priv.set( elem, "hasDataAttrs", true );//然后把hasDataAttrs属性设为true
 				}
 			}
 
@@ -3553,8 +3553,8 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Da
 		}
 
 		// Sets multiple values
-		if ( typeof key === "object" ) {	//如果key为对象，遍历节点对象，并调用set方法
-			return this.each(function() {
+		if ( typeof key === "object" ) {	//如果key为对象，遍历jQuery对象，并调用set方法
+			return this.each(function() {//实例方法下，只要是给DOM扩展属性或者设置状态，都要调用each方法，为当前jQuery对象下的所有DOM执行同样的操作
 				data_user.set( this, key );
 			});
 		}
@@ -3567,10 +3567,10 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Da
 			// (and therefore has an element appears at this[ 0 ]) and the
 			// `value` parameter was not undefined. An empty jQuery object
 			// will result in `undefined` for elem = this[ 0 ] which will
-			// throw an exception if an attempt to read a data cache is made.
+			// throw an exception if an attempt to read a data cache is made.  这里要判断elem是否存在
 			if ( elem && value === undefined ) {//当value为undefined时，为获取当前节点key的缓存值
 				// Attempt to get data from the cache
-				// with the key as-is
+				// with the key as-is  同时获取了当前节点缓存对象的key以及key的驼峰表示
 				data = data_user.get( elem, key );
 				if ( data !== undefined ) {
 					return data;
@@ -3585,7 +3585,7 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Da
 
 				// Attempt to "discover" the data in
 				// HTML5 custom data-* attrs
-				data = dataAttr( elem, camelKey, undefined );
+				data = dataAttr( elem, camelKey, undefined );//如果在缓存对象下找不到存储的数据，则寻找当前节点的data-*属性下缓存的数据，并返回
 				if ( data !== undefined ) {
 					return data;
 				}
@@ -3598,7 +3598,7 @@ jQuery.fn.extend({  //下面几个方法扩展到jQuery实例下,data方法将Da
 			this.each(function() {  //给当前jQuery对象下的每个节点都缓存数据
 				// First, attempt to store a copy or reference of any
 				// data that might've been store with a camelCased key.
-				var data = data_user.get( this, camelKey );
+				var data = data_user.get( this, camelKey ); 
 
 				// For HTML5 data-* attribute interop, we have to
 				// store property names with dashes in a camelCase form.
@@ -3627,22 +3627,22 @@ function dataAttr( elem, key, data ) {
 
 	// If nothing was found internally, try to fetch any
 	// data from the HTML5 data-* attribute
-	if ( data === undefined && elem.nodeType === 1 ) {
-		name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();
-		data = elem.getAttribute( name );
+	if ( data === undefined && elem.nodeType === 1 ) {//如果当前节点的data为undefined
+		name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();//将驼峰表示转化成之前的样子
+		data = elem.getAttribute( name );//获取缓存值
 
 		if ( typeof data === "string" ) {
 			try {
 				data = data === "true" ? true :
 					data === "false" ? false :
 					data === "null" ? null :
-					// Only convert to a number if it doesn't change the string
-					+data + "" === data ? +data :
-					rbrace.test( data ) ? JSON.parse( data ) :
+					// Only convert to a number if it doesn't change the string 为一个字符串数字
+					+data + "" === data ? +data :  
+					rbrace.test( data ) ? JSON.parse( data ) :   //rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,判断是不是一个json
 					data;
 			} catch( e ) {}
 
-			// Make sure we set the data so it isn't changed later
+			// Make sure we set the data so it isn't changed later  把data缓存到jQuery的cache对象上
 			data_user.set( elem, key, data );
 		} else {
 			data = undefined;

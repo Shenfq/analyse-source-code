@@ -133,23 +133,129 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 		return value !== undefined ? value : key; //最后返回缓存的数据
 	}
 
-理解上面三个方法后，再看看jQuery扩展的data方法就一目了然
+理解上面三个方法后，再看看jQuery扩展的几个方法就一目了然，其实就是调用了Data原型下的几个方法。
 
 	jQuery.extend({
+		acceptData: Data.accepts,
+
+		hasData: function( elem ) {
+			return data_user.hasData( elem ) || data_priv.hasData( elem );
+		},
+	
 		data: function( elem, name, data ) {
 			return data_user.access( elem, name, data );
+		},
+	
+		removeData: function( elem, name ) {
+			data_user.remove( elem, name );
 		}
 	});
 
-我们能看出其实data方法就是Data.prototype下的access方法。
+
 
 了解了静态方法下的data后，我们在看看实例方法下的data方法，也就是通过jQuery.fn.extend扩展的data。在jQuery中很多方法都会扩展两次，一次是扩展在jQuery对象上，还一次就是扩展在jQuery的原型对象上。我们都知道jQuery是一个以DOM操作为主的库，所以我们很多时候是使用的实例方法，而且还能在一个jQuery对象上进行链式调用。jQuery中的静态方法其实是在内部提供给实例方法使用的，实例方法则是对静态方法的进一步抽象，不信你接下来看看jQuery.fn.data是不是比jQuery.data复杂的多。
 
 
 
+	jQuery.fn.extend({
+			data: function( key, value ) {
+			var attrs, name,
+				elem = this[ 0 ],//elem表示当前$对象下的第一个dom对象
+				i = 0,
+				data = null;
+			//如果key不存在获取elem所有缓存数据
+			if ( key === undefined ) {
+				if ( this.length ) {
+					data = data_user.get( elem );  //获取当前elem下的所有缓存数据
+					if ( elem.nodeType === 1 && !data_priv.get( elem, "hasDataAttrs" ) ) {
+						attrs = elem.attributes;//获取elem下面所有的属性
+						for ( ; i < attrs.length; i++ ) {
+							name = attrs[ i ].name;//获取属性名
+							if ( name.indexOf( "data-" ) === 0 ) {//判断是不是html5的自定义属性data-*
+								name = jQuery.camelCase( name.slice(5) );
+								dataAttr( elem, name, data[ name ] );//如果data[name]是undefined，就将该属性及其值缓存到cache对象上，该方法在（3625行）
+							}
+						}
+						data_priv.set( elem, "hasDataAttrs", true );//然后把hasDataAttrs属性设为true
+					}
+				}
+				return data;
+			}
+			//如果key为对象，遍历jQuery对象，并调用set方法
+			if ( typeof key === "object" ) {
+				return this.each(function() {//实例方法下，只要是给DOM扩展属性或者设置状态，都要调用each方法，为当前jQuery对象下的所有DOM执行同样的操作
+					data_user.set( this, key );
+				});
+			}
+			//key存在且不是一个对象时
+			return jQuery.access( this, function( value ) {
+				var data,
+					camelKey = jQuery.camelCase( key );//获取当前key的驼峰表示
+
+				if ( elem && value === undefined ) {//当value为undefined时，为获取当前节点key的缓存值
+					// 同时获取了当前节点缓存对象的key以及key的驼峰表示
+					data = data_user.get( elem, key );
+					if ( data !== undefined ) {
+						return data;
+					}
+					data = data_user.get( elem, camelKey );
+					if ( data !== undefined ) {
+						return data;
+					}
+					data = dataAttr( elem, camelKey, undefined );//如果在缓存对象下找不到存储的数据，则寻找当前节点的data-*属性下缓存的数据，并返回
+					if ( data !== undefined ) {
+						return data;
+					}
+
+					return;//通过三种方式都找不到数据，则直接跳出
+				}
+				this.each(function() {  //给当前jQuery对象下的每个节点都缓存数据
+					var data = data_user.get( this, camelKey );//先获取了其驼峰表示法的值
+					data_user.set( this, camelKey, value );//以驼峰表示的属性名来缓存数据对象，因为html5的data属性必须以这种方式缓存数据
+					if ( key.indexOf("-") !== -1 && data !== undefined ) {
+						data_user.set( this, key, value );//如果key存在'-'，且data有值，则以key的方式缓存一次value
+					}
+				});
+			}, null, value, arguments.length > 1, null, true );
+		},
+		
+		//可以看到实例方法下的data方法多了很多判断，为了用户方便，会在缓存对象时，会把属性名转换成驼峰表示法进行缓存。
+	
+		removeData: function( key ) {//移除缓存
+			return this.each(function() {
+				data_user.remove( this, key );//直接调用了Data.prototype下的remove方法
+			});
+		}
+	)};
 
 
+再看看在实例方法中用到dataAttr到底做了什么：
 
+	该方法主要是获取了elem节点上使用html5新方式扩展的data-*属性，然后把该属性缓存到cache对象上，并缓存该属性值。
+	function dataAttr( elem, key, data ) {
+		var name;
+		if ( data === undefined && elem.nodeType === 1 ) {//如果当前节点的data为undefined
+			name = "data-" + key.replace( rmultiDash, "-$1" ).toLowerCase();//将驼峰表示转化成之前的样子
+			data = elem.getAttribute( name );//获取缓存值
+			if ( typeof data === "string" ) {
+				try {
+					data = data === "true" ? true :
+						data === "false" ? false :
+						data === "null" ? null :
+						+data + "" === data ? +data :  
+						rbrace.test( data ) ? JSON.parse( data ) :
+						//rbrace = /(?:\{[\s\S]*\}|\[[\s\S]*\])$/,判断是不是一个json
+						data;
+				} catch( e ) {}
+
+				// 把data缓存到jQuery的cache对象上
+				data_user.set( elem, key, data );
+			} else {
+				data = undefined;
+			}
+		}
+		return data;
+	}
 
 ----------
 

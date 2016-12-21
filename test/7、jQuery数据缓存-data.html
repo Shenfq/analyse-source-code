@@ -10,6 +10,8 @@
 	<div id="mydiv2">bbb</div>
 	<div id="mydiv3">ccc</div>
 
+	<div id="test" data-test='true' data-test-num="123">test text</div>
+
 	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
 	<script type="text/javascript">
 		
@@ -20,17 +22,17 @@
 		//$('').data()方法
 		//该方法将缓存标识放在$对象下的第一个DOM对象上，aa1和aa2获取的是同一个DOM对象，所以缓存数据位置一样
 
-		aa1.data('a',1111);
+		/*aa1.data('a',1111);
 		aa2.data('a',2222);
 
 		console.log({1:aa1,2:aa2});
 		console.log( aa1.data('a') );  //结果222222
 		console.log( aa2.data('a') );  //结果222222
-		/*
+		*/
 		//=======第二组=========
 		//$.data()方法
 		//该方法将缓存标识放在对象上，aa1和aa2是不同对象，所以缓存数据位置不一样
-
+		/*
 		$.data(aa1,"b","1111");
 		$.data(aa2,"b","2222");
 
@@ -59,6 +61,20 @@
 		$.data(obj,'key2','bbb');
 		console.log( $.data(obj) );
 		*/
+
+		var testvalue = $('#test').data('test'); //使用data对象也能获取当前节点下的data-*属性，并将类型进行了转化
+		console.log(testvalue +'\n'+ typeof testvalue); //true  boolean
+
+		var testvalue = $('#test').data('testNum'); //使用data对象也能获取当前节点下的data-*属性，并将类型进行了转化
+		console.log(testvalue +'\n'+ typeof testvalue); //123  number
+		
+		$('#test').data('test-num',111);
+		var testvalue = $('#test').data('testNum');  //缓存的属性也能够通过其驼峰方式获取
+		console.log(testvalue); //111
+
+		console.log('----------------------------');
+		$('#test').data('test-num',222);
+		console.log($('#test').data());
 	</script>
 </body>
 </html>
