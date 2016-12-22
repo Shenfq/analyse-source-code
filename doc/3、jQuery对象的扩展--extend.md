@@ -6,10 +6,27 @@
 - 而通过 $.fn.extend() 扩展的是实例方法。
 
 
-    jQuery.extend = jQuery.fn.extend = function() {}   //源码285行
+写过jQuery插件的通过应该都知道，很多时候我们都是使用extend来为jQuery对象添加插件的。
+> 插件的写法：
+
+	;(function($){
+		$.fn.extend({
+			Firstplus: function() {}
+		});
+
+		//这样写的话插件的使用方法就是：$('div').Firstplus();
+
+		$.extend({
+			Secondplus: function() {}
+		});
+		//这样写的话插件的使用方法就是：$.Secondplus();
+	})($);
+
 
 
 查看源码的第285行，$.extend()和$.fn.extend()调用的其实是同一个函数，那么他们实现的功能为什么不同呢？
+
+    jQuery.extend = jQuery.fn.extend = function() {}   //源码285行
 
 主要是因为这个方法都是将传入的对象扩展到了this上。
 
@@ -19,12 +36,15 @@
 
 
 以下是extend的三种不同用法：
+
 1. jQuery.extend(  [ object ] )
-	将传入的 object 扩展到 this 对象上
-2. jQuery.extend( target, [ object1 ], [ objectN ] )
-	将后面传入的 object1 到 objectN 扩展到 target 对象上
-3. jQuery.extend( [ deep ], target, object1, [ objectN ] )
-	如果传入了 deep 参数表示递归后面传入object1到objectN对象然后在扩展到target，这样同名的属性名就不会被覆盖了。
+	>将传入的 object 扩展到 this 对象上
+
+2. jQuery.extend( target, [ object1 ,... objectN ] )
+	>将后面传入的 object1 到 objectN 扩展到 target 对象上
+
+3. jQuery.extend( [ deep ], target, [object1,... objectN ] )
+	>如果传入了 deep 参数表示递归后面传入object1到objectN对象然后在扩展到target，这样同名的属性名就不会被覆盖了。
 
 具体看下源码分析：
 
@@ -36,11 +56,13 @@
 		i = 1,  //i用来表示target后面传入的对象是arguments的第几个参数
 		length = arguments.length,   
 		deep = false;  //deep变量表示，是否进行深度拷贝
-	
+
+	//先进行了一系列的if判断，来初始化参数，判断到底是要扩展jQuery还是对传入的对象进行扩展
+
 	//如果第一个参数是布尔类型，则表示是否深度拷贝
 	if ( typeof target === "boolean" ) {
 		deep = target;
-		target = arguments[1] || {};  //将目标对象置为传入的第二对象
+		target = arguments[1] || {};  //将目标对象置为传入的第二个参数，如果没有置为空对象
 		// skip the boolean and the target
 		i = 2;   //将i置为2
 	}
@@ -57,14 +79,14 @@
 		--i;  //且让i--，这时arguments[i]表示的才是要扩展到jquery上的对象
 	}
 
-	for ( ; i < length; i++ ) { //target后面的参数开始遍历传入的 arguments
-		// target后面的obj不为空时
+	for ( ; i < length; i++ ) { //开始遍历传入的 arguments
+		// 只有参数不为空时才执行后面的操作
 		if ( (options = arguments[ i ]) != null ) {
-			// Extend the base object
-			for ( name in options ) {  //遍历每个传入的obj
+			// 对对象进行扩展，无论传入的target对象，还是jQuery对象，都使用同样的方法进行扩展
+			for ( name in options ) {  //遍历传入的对象的属性
 				src = target[ name ];
 				copy = options[ name ];
-				//防止target和obj的某个属性是同一对象进入死循环
+				//防止target和obj的某个属性指向的是同一对象进入死循环
 				if ( target === copy ) {  
 					continue;
 				}
@@ -82,7 +104,8 @@
 
 					// 进行递归，直到属性不再为一个对象或数组
 					target[ name ] = jQuery.extend( deep, clone, copy );
-				} else if ( copy !== undefined ) {//如果不进行深拷贝或者obj的属性不是对象或数组了，扩展target对象，且和当前obj属性名相同。
+				} else if ( copy !== undefined ) {//如果不进行深拷贝且当前obj的属性不为空
+					//扩展target对象，且和当前obj属性名相同。
 					target[ name ] = copy;
 				}
 			}

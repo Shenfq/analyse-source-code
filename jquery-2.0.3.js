@@ -288,7 +288,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 		i = 1,
 		length = arguments.length,
 		deep = false;
-
+	//先进行了一系列的if判断，来初始化参数，判断到底是要扩展jQuery还是对传入的对象进行扩展
 	// Handle a deep copy situation   如果第一个参数是布尔类型，则表示是否深度拷贝
 	if ( typeof target === "boolean" ) {
 		deep = target;
