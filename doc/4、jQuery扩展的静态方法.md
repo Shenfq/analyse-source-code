@@ -33,7 +33,7 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 		
 		camelCase: 转换为驼峰命名法
 	
-		nodeName: 
+		nodeName: 检查DOM元素的节点名称与指定的值是否相等，不区分大小写
 	
 		each: 遍历一个数组或对象
 	
@@ -41,7 +41,7 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 	
 		makeArray: 将一个变量转换成数组
 	
-		inArray: 
+		inArray: 判断一个元素是否在一个数组中
 	
 		merge: 合并对象和数组
 	

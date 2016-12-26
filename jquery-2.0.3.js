@@ -751,7 +751,7 @@ jQuery.extend({
 				jQuery.access( elems, fn, i, key[i], true, emptyGet, raw );
 			}
 
-		// Sets one value
+		// Sets one value  set操作
 		} else if ( value !== undefined ) {
 			chainable = true;
 
@@ -761,7 +761,7 @@ jQuery.extend({
 
 			if ( bulk ) {
 				// Bulk operations run against the entire set
-				if ( raw ) {//当value不为一个函数时，将value作为参数传递给回调，或者传入了raw为true
+				if ( raw ) {//当value不为一个函数时，将value作为参数传递给回调
 					fn.call( elems, value );
 					fn = null;
 
@@ -784,7 +784,7 @@ jQuery.extend({
 		return chainable ?
 			elems :
 
-			// Gets
+			// Gets  get操作
 			bulk ?
 				fn.call( elems ) :
 				length ? fn( elems[0], key ) : emptyGet;
@@ -4092,42 +4092,42 @@ jQuery.extend({
 			nType = elem.nodeType;
 
 		// don't get/set attributes on text, comment and attribute nodes
-		if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {
+		if ( !elem || nType === 3 || nType === 8 || nType === 2 ) {  //如果是节点是属性、文本或注释则跳出
 			return;
 		}
 
 		// Fallback to prop when attributes are not supported
-		if ( typeof elem.getAttribute === core_strundefined ) {
+		if ( typeof elem.getAttribute === core_strundefined ) { //如果该节点没有getAttribute方法（例如document节点），则调用prop方法进行设置
 			return jQuery.prop( elem, name, value );
 		}
 
 		// All attributes are lowercase
 		// Grab necessary hook if one is defined
-		if ( nType !== 1 || !jQuery.isXMLDoc( elem ) ) {
-			name = name.toLowerCase();
-			hooks = jQuery.attrHooks[ name ] ||
+		if ( nType !== 1 || !jQuery.isXMLDoc( elem ) ) {  //该元素如果不是元素节点或者不是一个XML节点
+			name = name.toLowerCase();  //将属性名转为小写
+			hooks = jQuery.attrHooks[ name ] ||    //调用钩子机制
 				( jQuery.expr.match.bool.test( name ) ? boolHook : nodeHook );
 		}
 
-		if ( value !== undefined ) {
+		if ( value !== undefined ) {  //如果value存在，表示set操作
 
 			if ( value === null ) {
-				jQuery.removeAttr( elem, name );
+				jQuery.removeAttr( elem, name );  //如果value为null则表示清空该属性
 
 			} else if ( hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ) {
-				return ret;
+				return ret;  //判断钩子机制中是否存在set方法
 
 			} else {
-				elem.setAttribute( name, value + "" );
+				elem.setAttribute( name, value + "" );  //使用setAttribute的方法来设置节点属性，并且将value转为一个字符串
 				return value;
 			}
 
 		} else if ( hooks && "get" in hooks && (ret = hooks.get( elem, name )) !== null ) {
-			return ret;
+			return ret; //判断钩子机制中是否存在get方法
 
 		} else {
-			ret = jQuery.find.attr( elem, name );
-
+			ret = jQuery.find.attr( elem, name );  //如果不存在value不存在，且hooks中没有get方法，则使用Sizzle中的attr来获取属性
+													//底层api还是调用的getAttribute
 			// Non-existent attributes return null, we normalize to undefined
 			return ret == null ?
 				undefined :
@@ -4138,26 +4138,26 @@ jQuery.extend({
 	removeAttr: function( elem, value ) {
 		var name, propName,
 			i = 0,
-			attrNames = value && value.match( core_rnotwhite );
+			attrNames = value && value.match( core_rnotwhite );  //将 "type  name  value"，将这个字符串分割成数组
 
-		if ( attrNames && elem.nodeType === 1 ) {
+		if ( attrNames && elem.nodeType === 1 ) {  //判断节点存在，且是元素节点
 			while ( (name = attrNames[i++]) ) {
-				propName = jQuery.propFix[ name ] || name;
+				propName = jQuery.propFix[ name ] || name;  //如果属性是class和for，则获取他们的别名
 
 				// Boolean attributes get special treatment (#10870)
-				if ( jQuery.expr.match.bool.test( name ) ) {
-					// Set corresponding property to false
-					elem[ propName ] = false;
+				if ( jQuery.expr.match.bool.test( name ) ) { //如果节点的属性是布尔类型的属性
+					// Set corresponding property to false 
+					elem[ propName ] = false;  //这种类型的属性除了移除Attribute之后，还要将节点属性置为false
 				}
 
-				elem.removeAttribute( name );
+				elem.removeAttribute( name );  //调用removeAttribute移除属性
 			}
 		}
 	},
 
 	attrHooks: {
 		type: {
-			set: function( elem, value ) {
+			set: function( elem, value ) {   //当设置input的type属性时会产生兼容性问题，hook机制就只为了解决兼容性的
 				if ( !jQuery.support.radioValue && value === "radio" && jQuery.nodeName(elem, "input") ) {
 					// Setting the type on a radio button after the value resets the value in IE6-9
 					// Reset value to default in case type is set after value during creation
@@ -4193,7 +4193,7 @@ jQuery.extend({
 			name = jQuery.propFix[ name ] || name;
 			hooks = jQuery.propHooks[ name ];
 		}
-
+		//操作基本与attr类型，只是调用的hooks不同
 		if ( value !== undefined ) {
 			return hooks && "set" in hooks && (ret = hooks.set( elem, value, name )) !== undefined ?
 				ret :
