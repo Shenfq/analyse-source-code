@@ -3827,31 +3827,31 @@ jQuery.fn.extend({
 			len = this.length,
 			proceed = typeof value === "string" && value;
 
-		if ( jQuery.isFunction( value ) ) {
-			return this.each(function( j ) {
-				jQuery( this ).addClass( value.call( this, j, this.className ) );
+		if ( jQuery.isFunction( value ) ) {  //判断要添加的class是不是函数
+			return this.each(function( j ) {  //支持通过回调函数返回值的方式添加class
+				jQuery( this ).addClass( value.call( this, j, this.className ) );  //回调传入两个值：当前节点index和当前节点的class名
 			});
 		}
 
-		if ( proceed ) {
+		if ( proceed ) { //只有传入的value是字符串时才添加到class
 			// The disjunction here is for better compressibility (see removeClass)
-			classes = ( value || "" ).match( core_rnotwhite ) || [];
+			classes = ( value || "" ).match( core_rnotwhite ) || [];  //通过匹配非空格字符的方式将字符串分割为数组
 
-			for ( ; i < len; i++ ) {
+			for ( ; i < len; i++ ) {  //对节点进行遍历
 				elem = this[ i ];
-				cur = elem.nodeType === 1 && ( elem.className ?
-					( " " + elem.className + " " ).replace( rclass, " " ) :
-					" "
+				cur = elem.nodeType === 1 && ( elem.className ?  //只有节点是元素节点才能添加class，并给元素节点的class前后添加空格
+					( " " + elem.className + " " ).replace( rclass, " " ) :   // rclass = /[\t\r\n\f]/g  将换行换页tab等空白字符替换成空格
+					" "//当前节点没有class则返回一个空格字符，注意不是空字符
 				);
 
-				if ( cur ) {
+				if ( cur ) { //cur不存在表示当前节点不是元素节点
 					j = 0;
-					while ( (clazz = classes[j++]) ) {
-						if ( cur.indexOf( " " + clazz + " " ) < 0 ) {
+					while ( (clazz = classes[j++]) ) { //遍历传入的class
+						if ( cur.indexOf( " " + clazz + " " ) < 0 ) { //只有class不存在当前节点才添加，避免重复添加
 							cur += clazz + " ";
 						}
 					}
-					elem.className = jQuery.trim( cur );
+					elem.className = jQuery.trim( cur );  //去掉前后空格
 
 				}
 			}
@@ -3867,7 +3867,7 @@ jQuery.fn.extend({
 			proceed = arguments.length === 0 || typeof value === "string" && value;
 
 		if ( jQuery.isFunction( value ) ) {
-			return this.each(function( j ) {
+			return this.each(function( j ) { //同样支持回调函数返回值的方式移除class
 				jQuery( this ).removeClass( value.call( this, j, this.className ) );
 			});
 		}
@@ -3886,11 +3886,11 @@ jQuery.fn.extend({
 					j = 0;
 					while ( (clazz = classes[j++]) ) {
 						// Remove *all* instances
-						while ( cur.indexOf( " " + clazz + " " ) >= 0 ) {
+						while ( cur.indexOf( " " + clazz + " " ) >= 0 ) {  //使用while的方式移除所有名为clazz的class名，避免一个节点上有多个同名class
 							cur = cur.replace( " " + clazz + " ", " " );
 						}
 					}
-					elem.className = value ? jQuery.trim( cur ) : "";
+					elem.className = value ? jQuery.trim( cur ) : "";  //如果value没有传入，清空class
 				}
 			}
 		}
@@ -3901,11 +3901,11 @@ jQuery.fn.extend({
 	toggleClass: function( value, stateVal ) {
 		var type = typeof value;
 
-		if ( typeof stateVal === "boolean" && type === "string" ) {
+		if ( typeof stateVal === "boolean" && type === "string" ) {  //通过传入stateVal的方式，判断是添加class还是删除class
 			return stateVal ? this.addClass( value ) : this.removeClass( value );
 		}
 
-		if ( jQuery.isFunction( value ) ) {
+		if ( jQuery.isFunction( value ) ) {  //同样支持回调函数返回值的方式添加和删除class
 			return this.each(function( i ) {
 				jQuery( this ).toggleClass( value.call(this, i, this.className, stateVal), stateVal );
 			});
@@ -3916,12 +3916,12 @@ jQuery.fn.extend({
 				// toggle individual class names
 				var className,
 					i = 0,
-					self = jQuery( this ),
+					self = jQuery( this ),  
 					classNames = value.match( core_rnotwhite ) || [];
 
-				while ( (className = classNames[ i++ ]) ) {
+				while ( (className = classNames[ i++ ]) ) { //toggle的基本思想就是有该class就移除，没有就添加
 					// check each className given, space separated list
-					if ( self.hasClass( className ) ) {
+					if ( self.hasClass( className ) ) { //通过hasClass进行判断
 						self.removeClass( className );
 					} else {
 						self.addClass( className );
@@ -3929,8 +3929,8 @@ jQuery.fn.extend({
 				}
 
 			// Toggle whole class name
-			} else if ( type === core_strundefined || type === "boolean" ) {
-				if ( this.className ) {
+			} else if ( type === core_strundefined || type === "boolean" ) {  //如果没有传入class名，或者只传入了一个boolean值
+				if ( this.className ) {  //移除所有的class，并通过data进行缓存，当传入true时再把之前缓存的class重新设置到节点
 					// store className if set
 					data_priv.set( this, "__className__", this.className );
 				}
@@ -3948,7 +3948,7 @@ jQuery.fn.extend({
 		var className = " " + selector + " ",
 			i = 0,
 			l = this.length;
-		for ( ; i < l; i++ ) {
+		for ( ; i < l; i++ ) {  //遍历节点，然后判断节点是否存在传入class(通过indexOf判断)，存在返回true，否则返回false
 			if ( this[i].nodeType === 1 && (" " + this[i].className + " ").replace(rclass, " ").indexOf( className ) >= 0 ) {
 				return true;
 			}
@@ -4289,7 +4289,7 @@ jQuery.each([ "radio", "checkbox" ], function() {
 			}
 		}
 	};
-	if ( !jQuery.support.checkOn ) {
+	if ( !jQuery.support.checkOn ) {  //检查选择框的默认值是否为on
 		jQuery.valHooks[ this ].get = function( elem ) {
 			// Support: Webkit
 			// "" is returned instead of "on" if a value isn't specified
