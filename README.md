@@ -29,7 +29,9 @@
 
 [(3653 , 3797) queue() : 队列方法 : 执行顺序的管理 ](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/9%E3%80%81queue%E9%98%9F%E5%88%97%E5%AF%B9%E8%B1%A1.md)
 
-(3803 , 4299) attr() prop() val() addClass()等 : 对元素属性的操作 
+(3803 , 4299) attr() prop() val() addClass()等 : 对元素属性的操作 :
+[1-对元素属性的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E6%93%8D%E4%BD%9C.md)
+[2-对元素Class名的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10-2%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0Class%E7%9A%84%E6%93%8D%E4%BD%9C.md)
 
 (4300 , 5128) on() trigger() : 事件操作的相关方法 
 
