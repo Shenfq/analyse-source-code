@@ -250,7 +250,7 @@ map方法是对一个数组进行映射，并返回一个新的数组。使用�
 
 merge方法是用来将两个数组或者对象进行合并。
 
-	merge: function( first, second ) {
+	merge: function( first, second ) {  //first变量最好为一个数组
 		var l = second.length,
 			i = first.length,
 			j = 0;
@@ -269,3 +269,13 @@ merge方法是用来将两个数组或者对象进行合并。
 
 		return first;
 	}
+
+
+
+----------
+
+inArray方法判断一个变量是否存在在一个数组中，其实就是通过调用数组的indexOf方法来判断。
+
+	inArray: function( elem, arr, i ) {
+		return arr == null ? -1 : core_indexOf.call( arr, elem, i );
+	},

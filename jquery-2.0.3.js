@@ -3961,7 +3961,7 @@ jQuery.fn.extend({
 		var hooks, ret, isFunction,
 			elem = this[0];
 
-		if ( !arguments.length ) {
+		if ( !arguments.length ) { //如果没有传入参数（通过判断arguments长度的方式）
 			if ( elem ) {
 				hooks = jQuery.valHooks[ elem.type ] || jQuery.valHooks[ elem.nodeName.toLowerCase() ];
 
@@ -3997,7 +3997,7 @@ jQuery.fn.extend({
 			}
 
 			// Treat null/undefined as ""; convert numbers to string
-			if ( val == null ) {
+			if ( val == null ) {  //将不同类型值转为字符串
 				val = "";
 			} else if ( typeof val === "number" ) {
 				val += "";
@@ -4022,8 +4022,8 @@ jQuery.extend({
 		option: {
 			get: function( elem ) {
 				// attributes.value is undefined in Blackberry 4.7 but
-				// uses .value. See #6932
-				var val = elem.attributes.value;
+				// uses .value. See #6932  不同浏览器在option的value不存在时，value默认返回text
+				var val = elem.attributes.value;   //有些浏览器会返回空，此处统一默认行为，不存在value返回value的text
 				return !val || val.specified ? elem.value : elem.text;
 			}
 		},
@@ -4031,21 +4031,21 @@ jQuery.extend({
 			get: function( elem ) {
 				var value, option,
 					options = elem.options,
-					index = elem.selectedIndex,
-					one = elem.type === "select-one" || index < 0,
-					values = one ? null : [],
+					index = elem.selectedIndex,  //被选中select的索引
+					one = elem.type === "select-one" || index < 0,  //判断select是单选还是多选
+					values = one ? null : [], //如果是多选values为一个数组
 					max = one ? index + 1 : options.length,
 					i = index < 0 ?
 						max :
 						one ? index : 0;
 
-				// Loop through all the selected options
+				// Loop through all the selected options  遍历所有的select下的option节点
 				for ( ; i < max; i++ ) {
 					option = options[ i ];
 
 					// IE6-9 doesn't update selected after form reset (#2551)
 					if ( ( option.selected || i === index ) &&
-							// Don't return options that are disabled or in a disabled optgroup
+							// Don't return options that are disabled or in a disabled optgroup过滤掉disable的option节点
 							( jQuery.support.optDisabled ? !option.disabled : option.getAttribute("disabled") === null ) &&
 							( !option.parentNode.disabled || !jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {
 
@@ -4054,10 +4054,10 @@ jQuery.extend({
 
 						// We don't need an array for one selects
 						if ( one ) {
-							return value;
+							return value;  //如果是单选，之间返回被选中的option的value
 						}
 
-						// Multi-Selects return an array
+						// Multi-Selects return an array  如果是多选将value添加到数组
 						values.push( value );
 					}
 				}
@@ -4071,15 +4071,15 @@ jQuery.extend({
 					values = jQuery.makeArray( value ),
 					i = options.length;
 
-				while ( i-- ) {
-					option = options[ i ];
+				while ( i-- ) { //遍历option节点
+					option = options[ i ];   //如果传入的value与option的value相同，则把这个option置为true
 					if ( (option.selected = jQuery.inArray( jQuery(option).val(), values ) >= 0) ) {
 						optionSet = true;
 					}
 				}
 
 				// force browsers to behave consistently when non-matching value is set
-				if ( !optionSet ) {
+				if ( !optionSet ) { //如果没有值被选中则把当前被选中索引号置为-1
 					elem.selectedIndex = -1;
 				}
 				return values;

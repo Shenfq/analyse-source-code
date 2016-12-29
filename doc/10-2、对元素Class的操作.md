@@ -6,19 +6,20 @@
 前面已经介绍了节点属性的操作，现在我们再看看元素节点class名的操作。
 
 jQuery中对class名的操作（主要是class名而不是对style的操作）一共提供了四个方法：
+
 1. addClass()  添加类名
 	- addClass(str)：  通过字符串的方式添加类名，多个类名用空格隔开
-	- addClass（function(){}）; 通过传入回调函数的返回值来添加类名
+	- addClass（function(){}）; 通过传入回调函数的返回值来添加类名,回调函数接受2个参数(当前节点索引、节点类名)，this指向节点
 2. removeClass()  删除类名
 	- removeClass(str)  通过传入字符串的方式删除类名，多个类名用空格隔开
-	- removeClass（function(){}）; 通过传入回调函数的返回值来删除类名
+	- removeClass（function(){}）; 通过传入回调函数的返回值来删除类名,回调函数接受2个参数(当前节点索引、节点类名)，this指向节点
 3. hasClass()   类名是否存在
 	- hasClass(str)  通过传入字符串的方式判断类名是否存在，只能判断一个类名
 4. toggleClass()  添加或删除类名
 	- toggleClass(boolean) 传入一个布尔值，如果是false则删除节点上的所有类名，并通过data缓存，如果是true则把之前缓存的类名重新添加到节点上
 	- toggleClass(str) 传入一个字符串，如果该类名存在就删除，不存在就添加
 	- toggleClass(str，boolean) 判断传入的boolean，如果是true调用add方法，如果是false调用remove方法
-	- toggleClass（function(){}）; 通过传入回调函数的返回值来添加或删除类名
+	- toggleClass（function(){},boolean）; 通过传入回调函数的返回值来添加或删除类名,回调函数接受3个参数(当前节点索引、节点类名、布尔值)，this指向节点
 
 这三个方法都是直接扩展在jQuery的实例方法中，因此也比较简单，没有像之前的实例方法一样先实现了内部的同名静态方法，再通过调用静态方法来扩展实例方法。所以我们直接看源码：
 
@@ -150,3 +151,177 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 			return false;
 		},
 	});
+
+
+这一部分jQuery还扩展了一个val方法，专门用来获取一些表单元素的value属性的值。这个方法有几个hooks，想让我们来看看这几个hooks是如何解决不同浏览器兼容的：
+
+
+	valHooks: {
+		option: {
+			get: function( elem ) {
+				// attributes.value is undefined in Blackberry 4.7 but
+				// uses .value. See #6932
+				var val = elem.attributes.value;
+				return !val || val.specified ? elem.value : elem.text;
+			}
+		},
+		select: {
+			get: function( elem ) {
+				var value, option,
+					options = elem.options,
+					index = elem.selectedIndex,
+					one = elem.type === "select-one" || index < 0,
+					values = one ? null : [],
+					max = one ? index + 1 : options.length,
+					i = index < 0 ?
+						max :
+						one ? index : 0;
+
+				// Loop through all the selected options
+				for ( ; i < max; i++ ) {
+					option = options[ i ];
+
+					// IE6-9 doesn't update selected after form reset (#2551)
+					if ( ( option.selected || i === index ) &&
+							// Don't return options that are disabled or in a disabled optgroup
+							( jQuery.support.optDisabled ? !option.disabled : option.getAttribute("disabled") === null ) &&
+							( !option.parentNode.disabled || !jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {
+
+						// Get the specific value for the option
+						value = jQuery( option ).val();
+
+						// We don't need an array for one selects
+						if ( one ) {
+							return value;
+						}
+
+						// Multi-Selects return an array
+						values.push( value );
+					}
+				}
+
+				return values;
+			},
+
+			set: function( elem, value ) {
+				var optionSet, option,
+					options = elem.options,
+					values = jQuery.makeArray( value ),
+					i = options.length;
+
+				while ( i-- ) {
+					option = options[ i ];
+					if ( (option.selected = jQuery.inArray( jQuery(option).val(), values ) >= 0) ) {
+						optionSet = true;
+					}
+				}
+
+				// force browsers to behave consistently when non-matching value is set
+				if ( !optionSet ) {
+					elem.selectedIndex = -1;
+				}
+				return values;
+			}
+		}
+	}
+
+	
+
+	jQuery.each([ "radio", "checkbox" ], function() {
+		jQuery.valHooks[ this ] = {
+			set: function( elem, value ) {
+				if ( jQuery.isArray( value ) ) {
+					return ( elem.checked = jQuery.inArray( jQuery(elem).val(), value ) >= 0 );
+				}
+			}
+		};
+		if ( !jQuery.support.checkOn ) {  //检查选择框的默认值是否为on
+			jQuery.valHooks[ this ].get = function( elem ) {
+				// 用来支持低版本的webkit浏览器，选择框的默认值为空
+				return elem.getAttribute("value") === null ? "on" : elem.value;
+			};
+		}
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------
+
+
+
+
+
+
+
+
+
+
+	val: function( value ) {
+		var hooks, ret, isFunction,
+			elem = this[0];
+
+		if ( !arguments.length ) { //如果没有传入参数（通过判断arguments长度的方式）
+			if ( elem ) {
+				hooks = jQuery.valHooks[ elem.type ] || jQuery.valHooks[ elem.nodeName.toLowerCase() ];
+
+				if ( hooks && "get" in hooks && (ret = hooks.get( elem, "value" )) !== undefined ) {
+					return ret;
+				}
+
+				ret = elem.value;
+
+				return typeof ret === "string" ?
+					// handle most common string cases
+					ret.replace(rreturn, "") :
+					// handle cases where value is null/undef or number
+					ret == null ? "" : ret;
+			}
+
+			return;
+		}
+
+		isFunction = jQuery.isFunction( value );
+
+		return this.each(function( i ) {
+			var val;
+
+			if ( this.nodeType !== 1 ) {
+				return;
+			}
+
+			if ( isFunction ) {
+				val = value.call( this, i, jQuery( this ).val() );
+			} else {
+				val = value;
+			}
+
+			// Treat null/undefined as ""; convert numbers to string
+			if ( val == null ) {
+				val = "";
+			} else if ( typeof val === "number" ) {
+				val += "";
+			} else if ( jQuery.isArray( val ) ) {
+				val = jQuery.map(val, function ( value ) {
+					return value == null ? "" : value + "";
+				});
+			}
+
+			hooks = jQuery.valHooks[ this.type ] || jQuery.valHooks[ this.nodeName.toLowerCase() ];
+
+			// If set returns undefined, fall back to normal setting
+			if ( !hooks || !("set" in hooks) || hooks.set( this, val, "value" ) === undefined ) {
+				this.value = val;
+			}
+		});
+	}

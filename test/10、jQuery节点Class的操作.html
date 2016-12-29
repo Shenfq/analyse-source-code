@@ -5,11 +5,37 @@
 	<title>Document</title>
 </head>
 <body>
-	<div id="box">1111</div>
+	<div id="box" class="a b c">1111</div>
 	<input id="inp" type="text" name="username" />
+	<ul id="myul">
+		<li>11</li>
+		<li>22</li>
+		<li>33</li>
+	</ul>
+	<select id="sel1" multiple>
+		<option>11</option>
+		<option>22</option>
+		<option>33</option>
+	</select>
+	<select id="sel2">
+		<option value="swim">swim</option>
+		<option value="run">run</option>
+		<option >play</option>
+	</select>
+	<button id="btn">按钮</button>
 	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
 	<script type="text/javascript">
-		
+		$('#myul li').addClass(function(i) {
+			return 'myli'+(++i);
+		});
+
+		$('#box').toggleClass(false);
+		//$('#box').toggleClass(true);
+		$('#btn').click(function() {
+			//console.log( $('#sel1').val() );
+			console.log( $('#sel2').val() );
+			$('#sel1').val('11');
+		});
 	</script>
 </body>
 </html>
