@@ -3960,19 +3960,19 @@ jQuery.fn.extend({
 	val: function( value ) {
 		var hooks, ret, isFunction,
 			elem = this[0];
-
+		//get操作只对jQuery对象的第一个节点进行操作，而set操作要针对所有的节点
 		if ( !arguments.length ) { //如果没有传入参数（通过判断arguments长度的方式）
 			if ( elem ) {
 				hooks = jQuery.valHooks[ elem.type ] || jQuery.valHooks[ elem.nodeName.toLowerCase() ];
 
 				if ( hooks && "get" in hooks && (ret = hooks.get( elem, "value" )) !== undefined ) {
-					return ret;
+					return ret;  //如果hooks存在，则调用hooks的get方法
 				}
 
 				ret = elem.value;
 
 				return typeof ret === "string" ?
-					// handle most common string cases
+					// handle most common string cases  兼容：有些浏览器返回的value会自动拼接一个\r在后面
 					ret.replace(rreturn, "") :
 					// handle cases where value is null/undef or number
 					ret == null ? "" : ret;
@@ -3981,9 +3981,9 @@ jQuery.fn.extend({
 			return;
 		}
 
-		isFunction = jQuery.isFunction( value );
+		isFunction = jQuery.isFunction( value ); //判断是否为一个函数
 
-		return this.each(function( i ) {
+		return this.each(function( i ) { //调用each，遍历jQuery对象上的节点
 			var val;
 
 			if ( this.nodeType !== 1 ) {
@@ -3991,7 +3991,7 @@ jQuery.fn.extend({
 			}
 
 			if ( isFunction ) {
-				val = value.call( this, i, jQuery( this ).val() );
+				val = value.call( this, i, jQuery( this ).val() ); //通过支持回调函数返回值的方式添加vlaue
 			} else {
 				val = value;
 			}
@@ -4284,14 +4284,14 @@ jQuery.each([
 jQuery.each([ "radio", "checkbox" ], function() {
 	jQuery.valHooks[ this ] = {
 		set: function( elem, value ) {
-			if ( jQuery.isArray( value ) ) {
+			if ( jQuery.isArray( value ) ) {  //通过传入的value将对于的选择框置为选中状态
 				return ( elem.checked = jQuery.inArray( jQuery(elem).val(), value ) >= 0 );
 			}
 		}
 	};
 	if ( !jQuery.support.checkOn ) {  //检查选择框的默认值是否为on
 		jQuery.valHooks[ this ].get = function( elem ) {
-			// Support: Webkit
+			// Support: Webkit 用来兼容老版本的webkit浏览器返回的选择框的默认值为空
 			// "" is returned instead of "on" if a value isn't specified
 			return elem.getAttribute("value") === null ? "on" : elem.value;
 		};

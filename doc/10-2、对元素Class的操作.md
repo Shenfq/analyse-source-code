@@ -156,12 +156,11 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 这一部分jQuery还扩展了一个val方法，专门用来获取一些表单元素的value属性的值。这个方法有几个hooks，想让我们来看看这几个hooks是如何解决不同浏览器兼容的：
 
 
-	valHooks: {
+	valHooks: {  //用来设置和获取option、select的value
 		option: {
 			get: function( elem ) {
-				// attributes.value is undefined in Blackberry 4.7 but
-				// uses .value. See #6932
-				var val = elem.attributes.value;
+				// 不同浏览器在option的value不存在时，value默认返回text
+				var val = elem.attributes.value;   //有些浏览器会返回空，此处统一默认行为，不存在value返回value的text
 				return !val || val.specified ? elem.value : elem.text;
 			}
 		},
@@ -169,21 +168,19 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 			get: function( elem ) {
 				var value, option,
 					options = elem.options,
-					index = elem.selectedIndex,
-					one = elem.type === "select-one" || index < 0,
-					values = one ? null : [],
+					index = elem.selectedIndex,  //被选中select的索引
+					one = elem.type === "select-one" || index < 0,  //判断select是单选还是多选
+					values = one ? null : [], //如果是多选values为一个数组
 					max = one ? index + 1 : options.length,
 					i = index < 0 ?
 						max :
 						one ? index : 0;
 
-				// Loop through all the selected options
+				// 遍历所有的select下的option节点
 				for ( ; i < max; i++ ) {
 					option = options[ i ];
-
-					// IE6-9 doesn't update selected after form reset (#2551)
 					if ( ( option.selected || i === index ) &&
-							// Don't return options that are disabled or in a disabled optgroup
+							//过滤掉disable的option节点
 							( jQuery.support.optDisabled ? !option.disabled : option.getAttribute("disabled") === null ) &&
 							( !option.parentNode.disabled || !jQuery.nodeName( option.parentNode, "optgroup" ) ) ) {
 
@@ -192,10 +189,10 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 
 						// We don't need an array for one selects
 						if ( one ) {
-							return value;
+							return value;  //如果是单选，之间返回被选中的option的value
 						}
 
-						// Multi-Selects return an array
+						// 如果是多选将value添加到数组
 						values.push( value );
 					}
 				}
@@ -209,15 +206,13 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 					values = jQuery.makeArray( value ),
 					i = options.length;
 
-				while ( i-- ) {
-					option = options[ i ];
+				while ( i-- ) { //遍历option节点
+					option = options[ i ];   //如果传入的value与option的value相同，则把这个option置为true
 					if ( (option.selected = jQuery.inArray( jQuery(option).val(), values ) >= 0) ) {
 						optionSet = true;
 					}
 				}
-
-				// force browsers to behave consistently when non-matching value is set
-				if ( !optionSet ) {
+				if ( !optionSet ) { //如果没有值被选中则把当前被选中索引号置为-1
 					elem.selectedIndex = -1;
 				}
 				return values;
@@ -225,19 +220,17 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 		}
 	}
 
-	
-
 	jQuery.each([ "radio", "checkbox" ], function() {
 		jQuery.valHooks[ this ] = {
 			set: function( elem, value ) {
-				if ( jQuery.isArray( value ) ) {
+				if ( jQuery.isArray( value ) ) {  //通过传入的value将对于的选择框置为选中状态
 					return ( elem.checked = jQuery.inArray( jQuery(elem).val(), value ) >= 0 );
 				}
 			}
 		};
 		if ( !jQuery.support.checkOn ) {  //检查选择框的默认值是否为on
 			jQuery.valHooks[ this ].get = function( elem ) {
-				// 用来支持低版本的webkit浏览器，选择框的默认值为空
+				//  用来兼容老版本的webkit浏览器返回的选择框的默认值为空
 				return elem.getAttribute("value") === null ? "on" : elem.value;
 			};
 		}
@@ -245,55 +238,33 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ----------
 
-
-
-
-
-
-
-
+看过val方法的hooks之后，最后简单看看val方法的具体实现
 
 
 	val: function( value ) {
 		var hooks, ret, isFunction,
 			elem = this[0];
-
+		//get操作只对jQuery对象的第一个节点进行操作，而set操作要针对所有的节点
 		if ( !arguments.length ) { //如果没有传入参数（通过判断arguments长度的方式）
 			if ( elem ) {
 				hooks = jQuery.valHooks[ elem.type ] || jQuery.valHooks[ elem.nodeName.toLowerCase() ];
-
 				if ( hooks && "get" in hooks && (ret = hooks.get( elem, "value" )) !== undefined ) {
-					return ret;
+					return ret;  //如果hooks存在，则调用hooks的get方法
 				}
-
 				ret = elem.value;
-
 				return typeof ret === "string" ?
-					// handle most common string cases
+					//兼容：有些浏览器返回的value会自动拼接一个\r在后面
 					ret.replace(rreturn, "") :
-					// handle cases where value is null/undef or number
 					ret == null ? "" : ret;
 			}
-
 			return;
 		}
 
-		isFunction = jQuery.isFunction( value );
+		isFunction = jQuery.isFunction( value ); //判断是否为一个函数
 
-		return this.each(function( i ) {
+		return this.each(function( i ) { //调用each，遍历jQuery对象上的节点
 			var val;
 
 			if ( this.nodeType !== 1 ) {
@@ -301,13 +272,11 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 			}
 
 			if ( isFunction ) {
-				val = value.call( this, i, jQuery( this ).val() );
+				val = value.call( this, i, jQuery( this ).val() ); //通过支持回调函数返回值的方式添加vlaue
 			} else {
 				val = value;
 			}
-
-			// Treat null/undefined as ""; convert numbers to string
-			if ( val == null ) {
+			if ( val == null ) {  //将不同类型值转为字符串
 				val = "";
 			} else if ( typeof val === "number" ) {
 				val += "";
@@ -316,12 +285,13 @@ jQuery中对class名的操作（主要是class名而不是对style的操作）�
 					return value == null ? "" : value + "";
 				});
 			}
-
 			hooks = jQuery.valHooks[ this.type ] || jQuery.valHooks[ this.nodeName.toLowerCase() ];
-
-			// If set returns undefined, fall back to normal setting
-			if ( !hooks || !("set" in hooks) || hooks.set( this, val, "value" ) === undefined ) {
+			if ( !hooks || !("set" in hooks) || hooks.set( this, val, "value" ) === undefined ) { //先进行hooks操作
 				this.value = val;
 			}
 		});
 	}
+
+
+
+到这里对元素属性部分已经全部分析完毕了，现在看源码已经没有之前那么吃力了，也渐渐熟悉了jQuery的代码风格，在工作中使用jQuery也更加熟悉了。接下来的是jQuery的事件处理部分，应该会耗时比较长，jQuery对事件处理提供的api也比较多，希望通过阅读下一部分能更加深入的理解js的事件处理机制，以及熟悉事件处理中的浏览器兼容问题。
