@@ -4350,7 +4350,7 @@ jQuery.event = {
 
 		// Init the element's event structure and main handler, if this is the first
 		if ( !(events = elemData.events) ) {
-			events = elemData.events = {};
+			events = elemData.events = {};  //将事件函数进行缓存
 		}
 		if ( !(eventHandle = elemData.handle) ) {
 			eventHandle = elemData.handle = function( e ) {
@@ -4406,7 +4406,7 @@ jQuery.event = {
 				// Only use addEventListener if the special events handler returns false
 				if ( !special.setup || special.setup.call( elem, data, namespaces, eventHandle ) === false ) {
 					if ( elem.addEventListener ) {
-						elem.addEventListener( type, eventHandle, false );
+						elem.addEventListener( type, eventHandle, false );  //其实最终就是通过addEventListener来绑定事件
 					}
 				}
 			}
@@ -4429,7 +4429,7 @@ jQuery.event = {
 			// Keep track of which events have ever been used, for event optimization
 			jQuery.event.global[ type ] = true;
 		}
-
+		console.log(elemData);
 		// Nullify elem to prevent memory leaks in IE
 		elem = null;
 	},
@@ -4491,7 +4491,7 @@ jQuery.event = {
 			// (avoids potential for endless recursion during removal of special event handlers)
 			if ( origCount && !handlers.length ) {
 				if ( !special.teardown || special.teardown.call( elem, namespaces, elemData.handle ) === false ) {
-					jQuery.removeEvent( elem, type, elemData.handle );
+					jQuery.removeEvent( elem, type, elemData.handle );  //该方法最后调用的就是removeEventListener
 				}
 
 				delete events[ type ];
@@ -4902,7 +4902,7 @@ jQuery.event = {
 
 jQuery.removeEvent = function( elem, type, handle ) {
 	if ( elem.removeEventListener ) {
-		elem.removeEventListener( type, handle, false );
+		elem.removeEventListener( type, handle, false );  //调用原生删除事件的方法
 	}
 };
 
@@ -5026,60 +5026,60 @@ if ( !jQuery.support.focusinBubbles ) {
 
 jQuery.fn.extend({
 
-	on: function( types, selector, data, fn, /*INTERNAL*/ one ) {
+	on: function( types, selector, data, fn, /*INTERNAL*/ one ) {   //types:事件名  selector:要进行事件代理的选择器  data:事件函数的参数  fn:事件函数  one:该事件是否是一次性事件
 		var origFn, type;
 
-		// Types can be a map of types/handlers
-		if ( typeof types === "object" ) {
+		// Types can be a map of types/handlers   该方法用于事件的绑定，后面的很多方法都是通过调用该方法来实现的
+		if ( typeof types === "object" ) {   //可以通过传入一个对象的方式进行事件绑定，对象的每个属性名表示事件名，值为要绑定的事件函数
 			// ( types-Object, selector, data )
 			if ( typeof selector !== "string" ) {
 				// ( types-Object, data )
 				data = data || selector;
 				selector = undefined;
 			}
-			for ( type in types ) {
+			for ( type in types ) {  //遍历对象，绑定事件
 				this.on( type, selector, data, types[ type ], one );
 			}
 			return this;
 		}
-
-		if ( data == null && fn == null ) {
+		//进行参数的修正，用来判断到底传入了哪些参数
+		if ( data == null && fn == null ) {  //如果第三四个参数都为空，则表示第二参数就是该事件函数
 			// ( types, fn )
 			fn = selector;
 			data = selector = undefined;
-		} else if ( fn == null ) {
-			if ( typeof selector === "string" ) {
-				// ( types, selector, fn )
+		} else if ( fn == null ) {  //第四个参数为空时
+			if ( typeof selector === "string" ) {  //先判断第二参数是否是字符串
+				// ( types, selector, fn )  表示要进行事件代理，第二个参数是要被代理的选择器
 				fn = data;
 				data = undefined;
 			} else {
-				// ( types, data, fn )
+				// ( types, data, fn )   此时第二个参数是事件函数的参数
 				fn = data;
 				data = selector;
 				selector = undefined;
 			}
 		}
 		if ( fn === false ) {
-			fn = returnFalse;
+			fn = returnFalse;  // function() {return false;}
 		} else if ( !fn ) {
-			return this;
+			return this;  //如果该事件函数为空 则直接跳出
 		}
 
-		if ( one === 1 ) {
+		if ( one === 1 ) {  //表示该事件函数只会触发一次
 			origFn = fn;
 			fn = function( event ) {
 				// Can use an empty set, since event contains the info
-				jQuery().off( event );
-				return origFn.apply( this, arguments );
+				jQuery().off( event );  //调用事件函数时，立即移除该事件函数    相当于： $(this).off(event)
+				return origFn.apply( this, arguments );  //然后调用原先要调用的函数
 			};
 			// Use same guid so caller can remove using origFn
 			fn.guid = origFn.guid || ( origFn.guid = jQuery.guid++ );
 		}
-		return this.each( function() {
+		return this.each( function() {   //遍历jQuery对象，然后通过jQuery.event下的add方法进行事件的绑定
 			jQuery.event.add( this, types, fn, data, selector );
 		});
 	},
-	one: function( types, selector, data, fn ) {
+	one: function( types, selector, data, fn ) {  //该方法就是on方法的别名，默认one参数为1
 		return this.on( types, selector, data, fn, 1 );
 	},
 	off: function( types, selector, fn ) {
@@ -5109,17 +5109,17 @@ jQuery.fn.extend({
 		if ( fn === false ) {
 			fn = returnFalse;
 		}
-		return this.each(function() {
+		return this.each(function() {  //遍历jQuery对象下的节点，最后通过调用remove方法实现事件删除
 			jQuery.event.remove( this, types, fn, selector );
 		});
 	},
 
-	trigger: function( type, data ) {
+	trigger: function( type, data ) {  //激活事件
 		return this.each(function() {
 			jQuery.event.trigger( type, data, this );
 		});
 	},
-	triggerHandler: function( type, data ) {
+	triggerHandler: function( type, data ) {   //激活事件并阻止事件的默认行为
 		var elem = this[0];
 		if ( elem ) {
 			return jQuery.event.trigger( type, data, elem, true );
@@ -6721,8 +6721,8 @@ jQuery.each( ("blur focus focusin focusout load resize scroll unload click dblcl
 	"mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave " +
 	"change select submit keydown keypress keyup error contextmenu").split(" "), function( i, name ) {
 
-	// Handle event binding
-	jQuery.fn[ name ] = function( data, fn ) {
+	// Handle event binding    通过事件名的方式绑定事件
+	jQuery.fn[ name ] = function( data, fn ) {   //调用该方法时，如果没有传入要事件函数，则激活该事件，调用trigger方法
 		return arguments.length > 0 ?
 			this.on( name, null, data, fn ) :
 			this.trigger( name );
@@ -6734,14 +6734,14 @@ jQuery.fn.extend({
 		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
 	},
 
-	bind: function( types, data, fn ) {
+	bind: function( types, data, fn ) {  //on方法的别名
 		return this.on( types, null, data, fn );
 	},
 	unbind: function( types, fn ) {
 		return this.off( types, null, fn );
 	},
 
-	delegate: function( selector, types, data, fn ) {
+	delegate: function( selector, types, data, fn ) {   //这里也是on方法的别名
 		return this.on( types, selector, data, fn );
 	},
 	undelegate: function( selector, types, fn ) {

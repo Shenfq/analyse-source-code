@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="box">123</div>
+	<div id="box2">
+		<p>1</p>
+		<p id="second">2</p>
+		<p id="once">3</p>
+	</div>
+	<input type="text" name="text" id="inp" />
+	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
+	<script type="text/javascript">
+		/*
+		function fun(a) {
+			console.log(a==null);
+		}
+		fun();
+
+		$('#box').on({  //通过传入对象的方式绑定事件
+			mousemove: function() {
+				$(this).css('backgroundColor','red');
+			},
+			mouseout: function() {
+				$(this).css('backgroundColor','');
+			}
+		});
+		$('#box2').on('click','#second','has click',function(event){   //进行事件委托，并传入参数
+			$(this).text(event.data);
+		}).on('click','#once','event once',function(event){alert(event.data)}, 1);  //该事件只会触发一次
+
+		$('#inp').focus('user trigger', function(event){
+			$(this).val(event.data);
+		});
+
+		//$('#inp').trigger('focus');
+		//$('#inp').triggerHandler('focus');  这个方法会阻止事件的默认行为
+		*/
+
+		var box = $('#box2');
+		box.on( 'click', function () { alert(1); } );
+		box.on( 'click', function () { alert(2); } );
+		box.on( 'click', '#second', '111', function () { alert(3); } );
+		box.on( 'mouseenter', function () { alert(4); } );
+
+		//jQuery并没有将事件处理函数直接绑定到DOM元素上，而是通过.data存储在缓存.data存储在缓存.cahce上，这里就是之前分析的贯穿整个体系的缓存系统了
+		elemData = {   //该对象是缓存在DOM节点下
+			events:{  //不同的事件类型已数组的方式进行缓存
+				'click': [  //每个事件类型属性下都是一个数组，事件委托从队列头部推入，而普通事件绑定从尾部推入，通过记录delegateCount来划分，委托(delegate)绑定和普通绑定。
+					//length: 3 , delegateCount:1 有事件代理的个数
+					{
+						data:"111",
+						guid:3,
+						handler:function(){},
+						namespace:"",
+						needsContext:false,
+						origType:"click",
+						selector:"#second",
+						type:"click",
+					},
+					{
+
+					},
+					{
+
+					}
+				],
+				'mouseover': []
+			},
+			handle:function (e) {
+				{
+					data:undefined,
+					guid:4,
+					handler:function(){},
+					namespace:"",
+					needsContext:undefined,
+					origType:"mouseenter",
+					selector:undefined,
+					type:"mouseover",
+				}
+			}
+		}
+	</script>
+</body>
+</html>
