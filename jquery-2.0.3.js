@@ -4329,48 +4329,48 @@ jQuery.event = {
 		var handleObjIn, eventHandle, tmp,
 			events, t, handleObj,
 			special, handlers, type, namespaces, origType,
-			elemData = data_priv.get( elem );
+			elemData = data_priv.get( elem );   //通过缓存对象，把当前节点的事件都缓存到缓存对象上
 
 		// Don't attach events to noData or text/comment nodes (but allow plain objects)
-		if ( !elemData ) {
-			return;
+		if ( !elemData ) {  //如果缓存对象不能创建，则表示该节点不是元素节点，跳出当前函数
+			return; 
 		}
 
 		// Caller can pass in an object of custom data in lieu of the handler
-		if ( handler.handler ) {
+		if ( handler.handler ) {  //可以传入一个对象，进行事件绑定，此处是参数的修正
 			handleObjIn = handler;
 			handler = handleObjIn.handler;
 			selector = handleObjIn.selector;
 		}
 
 		// Make sure that the handler has a unique ID, used to find/remove it later
-		if ( !handler.guid ) {
-			handler.guid = jQuery.guid++;
+		if ( !handler.guid ) {  //guid为jQuery中的一个唯一标识字符串，用来表示特定的函数
+			handler.guid = jQuery.guid++;  //保证每个事件函数都是唯一的
 		}
 
 		// Init the element's event structure and main handler, if this is the first
-		if ( !(events = elemData.events) ) {
-			events = elemData.events = {};  //将事件函数进行缓存
+		if ( !(events = elemData.events) ) {  //如果该节点是第一次绑定事件
+			events = elemData.events = {};  //在事件缓存对象上创建一个events属性，用来缓存不同事件类型的事件函数
 		}
-		if ( !(eventHandle = elemData.handle) ) {
-			eventHandle = elemData.handle = function( e ) {
+		if ( !(eventHandle = elemData.handle) ) { //事件缓存对象上没有handle属性时，创建该属性
+			eventHandle = elemData.handle = function( e ) {  //这是真正绑定到节点上的事件函数
 				// Discard the second event of a jQuery.event.trigger() and
 				// when an event is called after a page has unloaded
 				return typeof jQuery !== core_strundefined && (!e || jQuery.event.triggered !== e.type) ?
-					jQuery.event.dispatch.apply( eventHandle.elem, arguments ) :
+					jQuery.event.dispatch.apply( eventHandle.elem, arguments ) :  //绑定的事件函数是通过dispatch方法进行包装后的返回值
 					undefined;
 			};
 			// Add elem as a property of the handle fn to prevent a memory leak with IE non-native events
-			eventHandle.elem = elem;
+			eventHandle.elem = elem;  //将节点放在该缓存对象中函数的一个属性上，用来防止IE的内存泄漏
 		}
 
 		// Handle multiple events separated by a space
 		types = ( types || "" ).match( core_rnotwhite ) || [""];
 		t = types.length;
 		while ( t-- ) {
-			tmp = rtypenamespace.exec( types[t] ) || [];
-			type = origType = tmp[1];
-			namespaces = ( tmp[2] || "" ).split( "." ).sort();
+			tmp = rtypenamespace.exec( types[t] ) || [];  //匹配出命名空间
+			type = origType = tmp[1];  //获取事件类型
+			namespaces = ( tmp[2] || "" ).split( "." ).sort(); //事件类型的命名空间数组
 
 			// There *must* be a type, no attaching namespace-only handlers
 			if ( !type ) {
@@ -4378,7 +4378,7 @@ jQuery.event = {
 			}
 
 			// If event changes its type, use the special event handlers for the changed type
-			special = jQuery.event.special[ type ] || {};
+			special = jQuery.event.special[ type ] || {}; //为一些事件类型的特殊情况进行处理
 
 			// If selector defined, determine special event api type, otherwise given type
 			type = ( selector ? special.delegateType : special.bindType ) || type;
@@ -5059,7 +5059,7 @@ jQuery.fn.extend({
 				selector = undefined;
 			}
 		}
-		if ( fn === false ) {
+		if ( fn === false ) {//绑定事件时，可以在传入事件函数的地方传入一个false用来阻止默认事件
 			fn = returnFalse;  // function() {return false;}
 		} else if ( !fn ) {
 			return this;  //如果该事件函数为空 则直接跳出

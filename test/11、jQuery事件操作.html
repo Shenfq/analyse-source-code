@@ -46,6 +46,9 @@
 		box.on( 'click', '#second', '111', function () { alert(3); } );
 		box.on( 'mouseenter', function () { alert(4); } );
 
+		var rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
+		console.log( rtypenamespace.exec('click.99.11.33')[2].split('.').sort() );
+
 		//jQuery并没有将事件处理函数直接绑定到DOM元素上，而是通过.data存储在缓存.data存储在缓存.cahce上，这里就是之前分析的贯穿整个体系的缓存系统了
 		elemData = {   //该对象是缓存在DOM节点下
 			events:{  //不同的事件类型已数组的方式进行缓存
@@ -68,19 +71,21 @@
 
 					}
 				],
-				'mouseover': []
+				'mouseover': [
+					{
+						data:undefined,
+						guid:4,
+						handler:function(){},
+						namespace:"",
+						needsContext:undefined,
+						origType:"mouseenter",
+						selector:undefined,
+						type:"mouseover",
+					}
+				]
 			},
-			handle:function (e) {
-				{
-					data:undefined,
-					guid:4,
-					handler:function(){},
-					namespace:"",
-					needsContext:undefined,
-					origType:"mouseenter",
-					selector:undefined,
-					type:"mouseover",
-				}
+			handle:function (e) {  //elem:div#box2
+				
 			}
 		}
 	</script>
