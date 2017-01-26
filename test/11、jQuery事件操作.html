@@ -44,7 +44,7 @@
 		box.on( 'click', function () { alert(1); } );
 		box.on( 'click', function () { alert(2); } );
 		box.on( 'click', '#second', '111', function () { alert(3); } );
-		box.on( 'mouseenter', function () { alert(4); } );
+		box.on( 'mouseenter', function () { console.log(4); } );
 
 		var rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
 		console.log( rtypenamespace.exec('click.99.11.33')[2].split('.').sort() );
@@ -87,6 +87,11 @@
 			handle:function (e) {  //elem:div#box2
 				
 			}
+		}
+
+		document.onkeypress = function(e) {
+			console.log(e.type);
+			console.log(e.keyCode);
 		}
 	</script>
 </body>

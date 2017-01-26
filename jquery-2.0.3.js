@@ -4297,10 +4297,10 @@ jQuery.each([ "radio", "checkbox" ], function() {
 		};
 	}
 });
-var rkeyEvent = /^key/,
-	rmouseEvent = /^(?:mouse|contextmenu)|click/,
-	rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
-	rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
+var rkeyEvent = /^key/,  //匹配键盘事件
+	rmouseEvent = /^(?:mouse|contextmenu)|click/,   //匹配鼠标事件
+	rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,  //匹配键盘获焦失焦事件
+	rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;   //匹配命名空间的正则
 
 function returnTrue() {
 	return true;
@@ -4322,7 +4322,7 @@ function safeActiveElement() {
  */
 jQuery.event = {
 
-	global: {},
+	global: {},//暂时没有用到该对象
 
 	add: function( elem, types, handler, data, selector ) {
 
@@ -4383,7 +4383,7 @@ jQuery.event = {
 			// If selector defined, determine special event api type, otherwise given type
 			type = ( selector ? special.delegateType : special.bindType ) || type;
 
-			// Update special based on newly reset type
+			// Update special based on newly reset type   更新special
 			special = jQuery.event.special[ type ] || {};
 
 			// handleObj is passed to all event handlers
@@ -4431,7 +4431,7 @@ jQuery.event = {
 		}
 		console.log(elemData);
 		// Nullify elem to prevent memory leaks in IE
-		elem = null;
+		elem = null;  //把elem置空，用来防止内存泄漏
 	},
 
 	// Detach an event or set of events from an element
@@ -4634,10 +4634,10 @@ jQuery.event = {
 		return event.result;
 	},
 
-	dispatch: function( event ) {
+	dispatch: function( event ) { //用来处理真正绑定到节点上的事件函数
 
 		// Make a writable jQuery.Event from the native event object
-		event = jQuery.event.fix( event );
+		event = jQuery.event.fix( event ); //对原生的event对象进行扩展和兼容性操作
 
 		var i, j, ret, matched, handleObj,
 			handlerQueue = [],
@@ -4739,19 +4739,19 @@ jQuery.event = {
 		return handlerQueue;
 	},
 
-	// Includes some event props shared by KeyEvent and MouseEvent
+	// Includes some event props shared by KeyEvent and MouseEvent  事件对象上的一些属性
 	props: "altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which".split(" "),
 
 	fixHooks: {},
 
-	keyHooks: {
+	keyHooks: {  //键盘事件的兼容处理
 		props: "char charCode key keyCode".split(" "),
 		filter: function( event, original ) {
 
-			// Add which for key events
-			if ( event.which == null ) {
+			// Add which for key events   获取键盘码，低版本ie没有which属性，统一各个浏览器的标准
+			if ( event.which == null ) {   //使用which表示键盘码    
 				event.which = original.charCode != null ? original.charCode : original.keyCode;
-			}
+			}  //charCode获取keypress事件的键盘码； keyCode获取keydown和keyup的键盘码
 
 			return event;
 		}
@@ -4768,14 +4768,14 @@ jQuery.event = {
 				eventDoc = event.target.ownerDocument || document;
 				doc = eventDoc.documentElement;
 				body = eventDoc.body;
-
+				//兼容pageX  通过距离视窗的距离加上滚动条滚动的距离
 				event.pageX = original.clientX + ( doc && doc.scrollLeft || body && body.scrollLeft || 0 ) - ( doc && doc.clientLeft || body && body.clientLeft || 0 );
 				event.pageY = original.clientY + ( doc && doc.scrollTop  || body && body.scrollTop  || 0 ) - ( doc && doc.clientTop  || body && body.clientTop  || 0 );
 			}
 
 			// Add which for click: 1 === left; 2 === middle; 3 === right
 			// Note: button is not normalized, so don't use it
-			if ( !event.which && button !== undefined ) {
+			if ( !event.which && button !== undefined ) {  //获得鼠标的按键码，左中右键
 				event.which = ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
 			}
 
@@ -4783,21 +4783,21 @@ jQuery.event = {
 		}
 	},
 
-	fix: function( event ) {
+	fix: function( event ) {  //进行event对象包装的函数
 		if ( event[ jQuery.expando ] ) {
-			return event;
+			return event;   //如果该事件对象已经进行过封装，直接返回
 		}
 
 		// Create a writable copy of the event object and normalize some properties
 		var i, prop, copy,
 			type = event.type,
-			originalEvent = event,
-			fixHook = this.fixHooks[ type ];
+			originalEvent = event,   //原始的event对象
+			fixHook = this.fixHooks[ type ];  //一个用来兼容event的集合
 
 		if ( !fixHook ) {
 			this.fixHooks[ type ] = fixHook =
-				rmouseEvent.test( type ) ? this.mouseHooks :
-				rkeyEvent.test( type ) ? this.keyHooks :
+				rmouseEvent.test( type ) ? this.mouseHooks :  //兼容鼠标事件
+				rkeyEvent.test( type ) ? this.keyHooks :   //兼容键盘事件
 				{};
 		}
 		copy = fixHook.props ? this.props.concat( fixHook.props ) : this.props;
@@ -4805,27 +4805,27 @@ jQuery.event = {
 		event = new jQuery.Event( originalEvent );
 
 		i = copy.length;
-		while ( i-- ) {
+		while ( i-- ) {   //将原event对象的属性拷贝到重新封装的event上
 			prop = copy[ i ];
 			event[ prop ] = originalEvent[ prop ];
 		}
 
 		// Support: Cordova 2.5 (WebKit) (#13255)
 		// All events should have a target; Cordova deviceready doesn't
-		if ( !event.target ) {
+		if ( !event.target ) {   //不存在target就让target指向document
 			event.target = document;
 		}
 
 		// Support: Safari 6.0+, Chrome < 28
 		// Target should not be a text node (#504, #13143)
-		if ( event.target.nodeType === 3 ) {
+		if ( event.target.nodeType === 3 ) {  //如果target是一个文本节点，让target指向其父节点
 			event.target = event.target.parentNode;
 		}
 
-		return fixHook.filter? fixHook.filter( event, originalEvent ) : event;
+		return fixHook.filter? fixHook.filter( event, originalEvent ) : event;  //对一些特殊事件的事件对象进行修复
 	},
 
-	special: {
+	special: {//对一些事件类型进行处理
 		load: {
 			// Prevent triggered image.load events from bubbling to window.load
 			noBubble: true
@@ -4908,14 +4908,14 @@ jQuery.removeEvent = function( elem, type, handle ) {
 
 jQuery.Event = function( src, props ) {
 	// Allow instantiation without the 'new' keyword
-	if ( !(this instanceof jQuery.Event) ) {
+	if ( !(this instanceof jQuery.Event) ) {  //用来实现没有new关键字就可以构建一个Event实例
 		return new jQuery.Event( src, props );
 	}
 
 	// Event object
 	if ( src && src.type ) {
-		this.originalEvent = src;
-		this.type = src.type;
+		this.originalEvent = src;  //originalEvent用来存储原始的事件对象
+		this.type = src.type;   //事件类型
 
 		// Events bubbling up the document may have been marked as prevented
 		// by a handler lower down the tree; reflect the correct value.
@@ -4928,14 +4928,14 @@ jQuery.Event = function( src, props ) {
 	}
 
 	// Put explicitly provided properties onto the event object
-	if ( props ) {
+	if ( props ) {  //将传入的属性扩展到新的事件对象上
 		jQuery.extend( this, props );
 	}
 
-	// Create a timestamp if incoming event doesn't have one
-	this.timeStamp = src && src.timeStamp || jQuery.now();
+	// Create a timestamp if incoming event doesn't have one  获取时间戳
+	this.timeStamp = src && src.timeStamp || jQuery.now();  
 
-	// Mark it as fixed
+	// Mark it as fixed   为封装过后的事件对象添加一个标记
 	this[ jQuery.expando ] = true;
 };
 
@@ -4946,7 +4946,7 @@ jQuery.Event.prototype = {
 	isPropagationStopped: returnFalse,
 	isImmediatePropagationStopped: returnFalse,
 
-	preventDefault: function() {
+	preventDefault: function() {  //阻止默认行为
 		var e = this.originalEvent;
 
 		this.isDefaultPrevented = returnTrue;
@@ -4955,7 +4955,7 @@ jQuery.Event.prototype = {
 			e.preventDefault();
 		}
 	},
-	stopPropagation: function() {
+	stopPropagation: function() {   //阻止冒泡
 		var e = this.originalEvent;
 
 		this.isPropagationStopped = returnTrue;
@@ -4966,7 +4966,7 @@ jQuery.Event.prototype = {
 	},
 	stopImmediatePropagation: function() {
 		this.isImmediatePropagationStopped = returnTrue;
-		this.stopPropagation();
+		this.stopPropagation();  //其实还是调用的stopPropagation(),有点重复
 	}
 };
 
