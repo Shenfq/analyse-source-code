@@ -4656,11 +4656,11 @@ jQuery.event = {
 
 		// Determine handlers  调制事件函数的触发顺序  传入事件对象和事件函数数组
 		handlerQueue = jQuery.event.handlers.call( this, event, handlers );
-
+		
 		// Run delegates first; they may want to stop propagation beneath us
 		i = 0;
 		while ( (matched = handlerQueue[ i++ ]) && !event.isPropagationStopped() ) {
-			event.currentTarget = matched.elem;
+			event.currentTarget = matched.elem;  //如果存在事件委托就将当前目标节点转为委托的节点
 
 			j = 0;
 			while ( (handleObj = matched.handlers[ j++ ]) && !event.isImmediatePropagationStopped() ) {
@@ -4671,12 +4671,12 @@ jQuery.event = {
 
 					event.handleObj = handleObj;
 					event.data = handleObj.data;
-
+					//console.log(event);
 					ret = ( (jQuery.event.special[ handleObj.origType ] || {}).handle || handleObj.handler )
-							.apply( matched.elem, args );
+							.apply( matched.elem, args );  //激活指定事件函数
 
 					if ( ret !== undefined ) {
-						if ( (event.result = ret) === false ) {
+						if ( (event.result = ret) === false ) {  //如果事件函数的返回值为false那么就阻止冒泡和默认事件
 							event.preventDefault();
 							event.stopPropagation();
 						}
@@ -4703,21 +4703,21 @@ jQuery.event = {
 		// Black-hole SVG <use> instance trees (#13180)
 		// Avoid non-left-click bubbling in Firefox (#3861)
 		if ( delegateCount && cur.nodeType && (!event.button || event.type !== "click") ) {
-			//找到事件委托的
-			for ( ; cur !== this; cur = cur.parentNode || this ) {
+			//找到事件委托的节点
+			for ( ; cur !== this; cur = cur.parentNode || this ) {//从激活事件的节点一直向上冒泡，一直冒泡到绑定事件的节点
 
 				// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-				if ( cur.disabled !== true || event.type !== "click" ) {
+				if ( cur.disabled !== true || event.type !== "click" ) { //只有按钮可点击时才能进行事件委托，或者不可点击时触发的不是点击事件
 					matches = [];
-					for ( i = 0; i < delegateCount; i++ ) {
+					for ( i = 0; i < delegateCount; i++ ) {  //遍历委托事件
 						handleObj = handlers[ i ];
 
 						// Don't conflict with Object.prototype properties (#13203)
 						sel = handleObj.selector + " ";
 
-						if ( matches[ sel ] === undefined ) {
+						if ( matches[ sel ] === undefined ) {  //通过选择器获取指派事件的节点
 							matches[ sel ] = handleObj.needsContext ?
-								jQuery( sel, this ).index( cur ) >= 0 :
+								jQuery( sel, this ).index( cur ) >= 0 : //返回值是原先元素相对于选择器匹配元素中的位置
 								jQuery.find( sel, this, null, [ cur ] ).length;
 						}
 						if ( matches[ sel ] ) {
@@ -4732,7 +4732,7 @@ jQuery.event = {
 		}
 
 		// Add the remaining (directly-bound) handlers
-		if ( delegateCount < handlers.length ) {
+		if ( delegateCount < handlers.length ) {  //添加没有进行委托的事件
 			handlerQueue.push({ elem: this, handlers: handlers.slice( delegateCount ) });
 		}
 

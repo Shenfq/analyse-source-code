@@ -6,11 +6,11 @@
 </head>
 <body>
 	<div id="box">123</div>
-	<div id="box2">
-		<p>1</p>
-		<p id="second">2</p>
-		<p id="once">3</p>
-	</div>
+	<ul id="box2">
+		<li id="first">1</li>
+		<li id="second">2</li>
+		<li id="once">3</li>
+	</ul>
 	<input type="text" name="text" id="inp" />
 	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
 	<script type="text/javascript">
@@ -41,10 +41,10 @@
 		*/
 
 		var box = $('#box2');
-		box.on( 'click', function () { alert(1); } );
-		box.on( 'click', function () { alert(2); } );
-		box.on( 'click', '#second', '111', function () { alert(3); } );
-		box.on( 'mouseenter', function (e) { console.log(e); } );
+		box.on( 'click', function () { console.log(1); } );
+		box.on( 'click', 'li', function (e) { console.log(2); } );
+		box.on( 'click', '#first', '111', function (e) { console.log(e); } );
+		box.on( 'mouseleave', function (e) { console.log(0); } );
 
 		var rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
 		console.log( rtypenamespace.exec('click.99.11.33')[2].split('.').sort() );
