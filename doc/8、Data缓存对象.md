@@ -13,7 +13,14 @@ jQuery为了解决这种内存泄漏引入了Data机制，其主要原理就是�
 下面简单看看这个对象的构造
 
 	function Data(){  //构造函数
-		//该对象下只有一个属性，这个属性是一个随机字符串，是打通cache对象与指定缓存对象的一座桥梁
+		//该对象下有两个属性：cache和expando
+		//一个属性是一个对象，用来存储要缓存的数据
+		//一个属性是一个随机字符串，是打通cache对象与指定缓存对象的一座桥梁
+		Object.defineProperty( this.cache = {}, 0, { 
+			get: function() {//当访问Data.cache[0]时，默认返回一个空对象，且不能被修改。
+				return {};
+			}
+		});
 		this.expando = jQuery.expando + Math.random();  //生成一个唯一字符串
 	}
 	Data.uid = 1;  //uid 从1开始，表示当前cache对象中的属性名

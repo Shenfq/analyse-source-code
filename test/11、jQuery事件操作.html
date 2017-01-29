@@ -44,7 +44,7 @@
 		box.on( 'click', function () { alert(1); } );
 		box.on( 'click', function () { alert(2); } );
 		box.on( 'click', '#second', '111', function () { alert(3); } );
-		box.on( 'mouseenter', function () { console.log(4); } );
+		box.on( 'mouseenter', function (e) { console.log(e); } );
 
 		var rtypenamespace = /^([^.]*)(?:\.(.+)|)$/;
 		console.log( rtypenamespace.exec('click.99.11.33')[2].split('.').sort() );

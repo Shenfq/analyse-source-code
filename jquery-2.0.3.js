@@ -4642,19 +4642,19 @@ jQuery.event = {
 		var i, j, ret, matched, handleObj,
 			handlerQueue = [],
 			args = core_slice.call( arguments ),
-			handlers = ( data_priv.get( this, "events" ) || {} )[ event.type ] || [],
-			special = jQuery.event.special[ event.type ] || {};
+			handlers = ( data_priv.get( this, "events" ) || {} )[ event.type ] || [], //通过event对象获得当前触发的事件类型，然后去缓存对象下取出相应的函数
+			special = jQuery.event.special[ event.type ] || {};  //对某些事件进行兼容处理
 
 		// Use the fix-ed jQuery.Event rather than the (read-only) native event
-		args[0] = event;
-		event.delegateTarget = this;
+		args[0] = event;  //取出事件对象，进过fix方法修正的
+		event.delegateTarget = this;  //this指向当前节点
 
 		// Call the preDispatch hook for the mapped type, and let it bail if desired
 		if ( special.preDispatch && special.preDispatch.call( this, event ) === false ) {
-			return;
+			return;  //某些事件在进行操作之前的特殊处理
 		}
 
-		// Determine handlers
+		// Determine handlers  调制事件函数的触发顺序  传入事件对象和事件函数数组
 		handlerQueue = jQuery.event.handlers.call( this, event, handlers );
 
 		// Run delegates first; they may want to stop propagation beneath us
@@ -4686,24 +4686,24 @@ jQuery.event = {
 		}
 
 		// Call the postDispatch hook for the mapped type
-		if ( special.postDispatch ) {
+		if ( special.postDispatch ) { //某些事件在进行操作之后的特殊处理
 			special.postDispatch.call( this, event );
 		}
 
 		return event.result;
 	},
 
-	handlers: function( event, handlers ) {
+	handlers: function( event, handlers ) {  //调整事件函数的调用顺序
 		var i, matches, sel, handleObj,
 			handlerQueue = [],
 			delegateCount = handlers.delegateCount,
-			cur = event.target;
+			cur = event.target;  // 表示触发事件的节点
 
 		// Find delegate handlers
 		// Black-hole SVG <use> instance trees (#13180)
 		// Avoid non-left-click bubbling in Firefox (#3861)
 		if ( delegateCount && cur.nodeType && (!event.button || event.type !== "click") ) {
-
+			//找到事件委托的
 			for ( ; cur !== this; cur = cur.parentNode || this ) {
 
 				// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
@@ -4744,7 +4744,7 @@ jQuery.event = {
 
 	fixHooks: {},
 
-	keyHooks: {  //键盘事件的兼容处理
+	keyHooks: {  //键盘事件对象的兼容处理
 		props: "char charCode key keyCode".split(" "),
 		filter: function( event, original ) {
 
@@ -4757,7 +4757,7 @@ jQuery.event = {
 		}
 	},
 
-	mouseHooks: {
+	mouseHooks: {  //鼠标事件对象的兼容处理
 		props: "button buttons clientX clientY offsetX offsetY pageX pageY screenX screenY toElement".split(" "),
 		filter: function( event, original ) {
 			var eventDoc, doc, body,
@@ -4828,7 +4828,7 @@ jQuery.event = {
 	special: {//对一些事件类型进行处理
 		load: {
 			// Prevent triggered image.load events from bubbling to window.load
-			noBubble: true
+			noBubble: true   //load事件不冒泡
 		},
 		focus: {
 			// Fire native event if possible so blur/focus sequence is correct
