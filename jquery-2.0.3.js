@@ -4429,7 +4429,7 @@ jQuery.event = {
 			// Keep track of which events have ever been used, for event optimization
 			jQuery.event.global[ type ] = true;
 		}
-		console.log(elemData);
+		//console.log(elemData);
 		// Nullify elem to prevent memory leaks in IE
 		elem = null;  //把elem置空，用来防止内存泄漏
 	},
@@ -4447,16 +4447,16 @@ jQuery.event = {
 		}
 
 		// Once for each type.namespace in types; type may be omitted
-		types = ( types || "" ).match( core_rnotwhite ) || [""];
+		types = ( types || "" ).match( core_rnotwhite ) || [""]; //匹配出事件类型  多个事件通过空格隔开
 		t = types.length;
 		while ( t-- ) {
 			tmp = rtypenamespace.exec( types[t] ) || [];
 			type = origType = tmp[1];
-			namespaces = ( tmp[2] || "" ).split( "." ).sort();
+			namespaces = ( tmp[2] || "" ).split( "." ).sort();//获取命名空间
 
 			// Unbind all events (on this namespace, if provided) for the element
-			if ( !type ) {
-				for ( type in events ) {
+			if ( !type ) {  //如果type不存在就移除所有的事件
+				for ( type in events ) {//遍历所有缓存的事件的事件类型，递归
 					jQuery.event.remove( elem, type + types[ t ], handler, selector, true );
 				}
 				continue;
@@ -4464,21 +4464,21 @@ jQuery.event = {
 
 			special = jQuery.event.special[ type ] || {};
 			type = ( selector ? special.delegateType : special.bindType ) || type;
-			handlers = events[ type ] || [];
+			handlers = events[ type ] || [];  //取出对应事件类型下所有的缓存事件函数
 			tmp = tmp[2] && new RegExp( "(^|\\.)" + namespaces.join("\\.(?:.*\\.|)") + "(\\.|$)" );
 
 			// Remove matching events
 			origCount = j = handlers.length;
-			while ( j-- ) {
+			while ( j-- ) {  //遍历缓存的事件函数
 				handleObj = handlers[ j ];
 
 				if ( ( mappedTypes || origType === handleObj.origType ) &&
-					( !handler || handler.guid === handleObj.guid ) &&
-					( !tmp || tmp.test( handleObj.namespace ) ) &&
+					( !handler || handler.guid === handleObj.guid ) &&  //匹配指定函数
+					( !tmp || tmp.test( handleObj.namespace ) ) &&  //匹配命名空间
 					( !selector || selector === handleObj.selector || selector === "**" && handleObj.selector ) ) {
-					handlers.splice( j, 1 );
+					handlers.splice( j, 1 ); //满足上面的条件就移除指定事件函数
 
-					if ( handleObj.selector ) {
+					if ( handleObj.selector ) {//该事件是委托事件就让委托计数器减1
 						handlers.delegateCount--;
 					}
 					if ( special.remove ) {
@@ -4499,7 +4499,7 @@ jQuery.event = {
 		}
 
 		// Remove the expando if it's no longer used
-		if ( jQuery.isEmptyObject( events ) ) {
+		if ( jQuery.isEmptyObject( events ) ) {//如果缓存的事件对象为空，移除该属性
 			delete elemData.handle;
 			data_priv.remove( elem, "events" );
 		}
@@ -4560,7 +4560,7 @@ jQuery.event = {
 		if ( !onlyHandlers && special.trigger && special.trigger.apply( elem, data ) === false ) {
 			return;
 		}
-
+		//大段的代码都是用来事件激活后冒泡的兼容与处理
 		// Determine event propagation path in advance, per W3C events spec (#9951)
 		// Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
 		if ( !onlyHandlers && !special.noBubble && !jQuery.isWindow( elem ) ) {
@@ -4591,7 +4591,7 @@ jQuery.event = {
 			// jQuery handler
 			handle = ( data_priv.get( cur, "events" ) || {} )[ event.type ] && data_priv.get( cur, "handle" );
 			if ( handle ) {
-				handle.apply( cur, data );
+				handle.apply( cur, data ); //此处进行事件函数的激活
 			}
 
 			// Native handler
@@ -4889,9 +4889,9 @@ jQuery.event = {
 				originalEvent: {}
 			}
 		);
-		if ( bubble ) {
+		if ( bubble ) { //如果要冒泡,利用jQuery.event.trigger模拟触发事件
 			jQuery.event.trigger( e, null, elem );
-		} else {
+		} else {  //否则利用jQuery.event.dispatch来执行处理
 			jQuery.event.dispatch.call( elem, e );
 		}
 		if ( e.isDefaultPrevented() ) {
