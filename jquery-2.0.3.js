@@ -218,7 +218,7 @@ jQuery.fn = jQuery.prototype = {//将jquery的原型对象赋给jquery.fn
 	// Take an array of elements and push it onto the stack
 	// (returning the new matched element set)
 	pushStack: function( elems ) {
-
+		
 		// Build a new jQuery matched element set
 		var ret = jQuery.merge( this.constructor(), elems );
 
@@ -5266,7 +5266,7 @@ jQuery.fn.extend({
 });
 
 function sibling( cur, dir ) {
-	while ( (cur = cur[dir]) && cur.nodeType !== 1 ) {}
+	while ( (cur = cur[dir]) && cur.nodeType !== 1 ) {}//只有兄弟节点是元素节点才返回
 
 	return cur;
 }
@@ -5314,11 +5314,11 @@ jQuery.each({
 		var matched = jQuery.map( this, fn, until );
 
 		if ( name.slice( -5 ) !== "Until" ) {
-			selector = until;
+			selector = until;  //判断是不是Until操作，并进行参数修正
 		}
 
 		if ( selector && typeof selector === "string" ) {
-			matched = jQuery.filter( selector, matched );
+			matched = jQuery.filter( selector, matched ); //通过选择器再进行一次筛选
 		}
 
 		if ( this.length > 1 ) {
@@ -5352,16 +5352,16 @@ jQuery.extend({
 			}));
 	},
 
-	dir: function( elem, dir, until ) {
+	dir: function( elem, dir, until ) { //从当前节点进行向上或向下遍历或向父节点遍历
 		var matched = [],
-			truncate = until !== undefined;
+			truncate = until !== undefined; //遍历到该节点停止
 
 		while ( (elem = elem[ dir ]) && elem.nodeType !== 9 ) {
-			if ( elem.nodeType === 1 ) {
+			if ( elem.nodeType === 1 ) {//必须为元素节点
 				if ( truncate && jQuery( elem ).is( until ) ) {
 					break;
 				}
-				matched.push( elem );
+				matched.push( elem );//将适合的节点放到数组中
 			}
 		}
 		return matched;
@@ -5370,8 +5370,8 @@ jQuery.extend({
 	sibling: function( n, elem ) {
 		var matched = [];
 
-		for ( ; n; n = n.nextSibling ) {
-			if ( n.nodeType === 1 && n !== elem ) {
+		for ( ; n; n = n.nextSibling ) {//获取所有的兄弟节点
+			if ( n.nodeType === 1 && n !== elem ) {//排除当前所选的节点
 				matched.push( n );
 			}
 		}

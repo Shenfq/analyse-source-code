@@ -33,7 +33,10 @@
 1. [对元素属性的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E6%93%8D%E4%BD%9C.md)    
 2. [对元素Class名的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10-2%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0Class%E7%9A%84%E6%93%8D%E4%BD%9C.md)
 
-(4300 , 5128) on() trigger() : 事件操作的相关方法 
+(4300 , 5128) on() trigger() : 事件操作的相关方法 :
+1. [事件绑定机制](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-1%E3%80%81%E4%BA%8B%E4%BB%B6%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6.md)
+2. [事件函数的处理](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-2%E3%80%81%E4%BA%8B%E4%BB%B6%E5%87%BD%E6%95%B0%E7%9A%84%E5%A4%84%E7%90%86.md)
+3. [事件解绑和激活](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-3%E3%80%81%E4%BA%8B%E4%BB%B6%E8%A7%A3%E7%BB%91%E5%92%8C%E6%BF%80%E6%B4%BB.md)
 
 (5140 , 6057) DOM操作 : 添加 删除 获取 包装 DOM筛选 
 

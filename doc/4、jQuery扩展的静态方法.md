@@ -45,11 +45,11 @@ jQuery在定义了extend之后，马上利用这个函数，对自身扩展了�
 	
 		merge: 合并对象和数组
 	
-		grep: 
+		grep: 进行数组过滤
 	
 		map: 遍历一个数组或对象
 	
-		guid: 
+		guid: 一个函数的唯一标识
 	
 		proxy: 
 

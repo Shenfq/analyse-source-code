@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="box">123</div>
+	<ul id="box2">
+		<li id="first">1</li>
+		<li id="second">2</li>
+		<li id="once">3</li>
+	</ul>
+	<input type="text" name="text" id="inp" />
+	<script type="text/javascript" src="../jquery-2.0.3.js"></script>
+	<script type="text/javascript">
+		console.log($('#box2').pushStack($('#first')));
+		console.log($(document).find('#box'));
+		console.log($().length);
+
+
+		//$('li').filter('#first').css('color','red');
+		//$('li').not('#first').css('color','red');
+	</script>
+</body>
+</html>
