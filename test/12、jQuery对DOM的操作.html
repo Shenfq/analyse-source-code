@@ -5,7 +5,12 @@
 	<title>Document</title>
 </head>
 <body>
-	<div id="box">123</div>
+	<div id="box">
+		123
+	<!-- 	<script>
+		alert(1);
+	</script> -->
+	</div>
 	<ul id="box2">
 		<li id="first">1</li>
 		<li id="second">2</li>
@@ -21,6 +26,24 @@
 
 		//$('li').filter('#first').css('color','red');
 		//$('li').not('#first').css('color','red');
+
+		$('#box').add('#first').css('color','red');
+		$('ul').find('#once').addBack().css('border','1px solid blue');
+
+		var body = $('body');
+		console.log(body.children());//获取所有的子元素节点
+		console.log(body.contents());//获取所有子节点(包括文本节点，注释等等)
+
+
+		$('#box').click(function() {
+			alert(1);
+		});
+		//var box = $('#box').remove(undefined, true);  //第二个参数用来保持节点的数据
+		var box = $('#box').remove(); //第二个参数不为true时，box中的script会执行两次
+
+		console.log(box);
+
+		$('body').before(box);
 	</script>
 </body>
 </html>

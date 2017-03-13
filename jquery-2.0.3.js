@@ -5143,7 +5143,7 @@ jQuery.fn.extend({
 			ret = [],
 			self = this,
 			len = self.length;
-
+		//不是字符串选择器时
 		if ( typeof selector !== "string" ) {
 			return this.pushStack( jQuery( selector ).filter(function() {
 				for ( i = 0; i < len; i++ ) {
@@ -5153,25 +5153,25 @@ jQuery.fn.extend({
 				}
 			}) );
 		}
-
+		//是字符串选择器时
 		for ( i = 0; i < len; i++ ) {
 			jQuery.find( selector, self[ i ], ret );
 		}
 
 		// Needed because $( selector, context ) becomes $( context ).find( selector )
-		ret = this.pushStack( len > 1 ? jQuery.unique( ret ) : ret );
-		ret.selector = this.selector ? this.selector + " " + selector : selector;
+		ret = this.pushStack( len > 1 ? jQuery.unique( ret ) : ret ); //去重
+		ret.selector = this.selector ? this.selector + " " + selector : selector;//重置选择器
 		return ret;
 	},
 
 	has: function( target ) {
-		var targets = jQuery( target, this ),
+		var targets = jQuery( target, this ), //先找到其子节点
 			l = targets.length;
 
 		return this.filter(function() {
 			var i = 0;
 			for ( ; i < l; i++ ) {
-				if ( jQuery.contains( this, targets[i] ) ) {
+				if ( jQuery.contains( this, targets[i] ) ) { //是否包含
 					return true;
 				}
 			}
@@ -5231,7 +5231,7 @@ jQuery.fn.extend({
 	// the matched set of elements
 	index: function( elem ) {
 
-		// No argument, return index in parent
+		// No argument, return index in parent  通过遍历前面兄弟节点的个数获取索引
 		if ( !elem ) {
 			return ( this[ 0 ] && this[ 0 ].parentNode ) ? this.first().prevAll().length : -1;
 		}
@@ -5311,7 +5311,7 @@ jQuery.each({
 	}
 }, function( name, fn ) {
 	jQuery.fn[ name ] = function( until, selector ) {
-		var matched = jQuery.map( this, fn, until );
+		var matched = jQuery.map( this, fn, until );//先对节点进行一边过滤
 
 		if ( name.slice( -5 ) !== "Until" ) {
 			selector = until;  //判断是不是Until操作，并进行参数修正
@@ -5323,17 +5323,17 @@ jQuery.each({
 
 		if ( this.length > 1 ) {
 			// Remove duplicates
-			if ( !guaranteedUnique[ name ] ) {
+			if ( !guaranteedUnique[ name ] ) { //去重操作
 				jQuery.unique( matched );
 			}
 
 			// Reverse order for parents* and prev-derivatives
-			if ( rparentsprev.test( name ) ) {
+			if ( rparentsprev.test( name ) ) { //对一些特殊情况进行排序操作
 				matched.reverse();
 			}
 		}
 
-		return this.pushStack( matched );
+		return this.pushStack( matched );//节点的入栈操作
 	};
 });
 
@@ -5405,7 +5405,7 @@ function winnow( elements, qualifier, not ) {
 		qualifier = jQuery.filter( qualifier, elements );
 	}
 
-	return jQuery.grep( elements, function( elem ) {
+	return jQuery.grep( elements, function( elem ) {  //通过not参数来判断是进行not还是filter操作
 		return ( core_indexOf.call( qualifier, elem ) >= 0 ) !== not;
 	});
 }
@@ -5484,19 +5484,19 @@ jQuery.fn.extend({
 	},
 
 	// keepData is for internal use only--do not document
-	remove: function( selector, keepData ) {
+	remove: function( selector, keepData ) {  //dom的删除操作
 		var elem,
-			elems = selector ? jQuery.filter( selector, this ) : this,
+			elems = selector ? jQuery.filter( selector, this ) : this,  //删除的筛选条件
 			i = 0;
 
 		for ( ; (elem = elems[i]) != null; i++ ) {
 			if ( !keepData && elem.nodeType === 1 ) {
-				jQuery.cleanData( getAll( elem ) );
+				jQuery.cleanData( getAll( elem ) );  //getAll  返回当前节点及节点的所有子元素
 			}
 
 			if ( elem.parentNode ) {
 				if ( keepData && jQuery.contains( elem.ownerDocument, elem ) ) {
-					setGlobalEval( getAll( elem, "script" ) );
+					setGlobalEval( getAll( elem, "script" ) );  //将其中的脚本设置为全局的
 				}
 				elem.parentNode.removeChild( elem );
 			}
@@ -5524,8 +5524,8 @@ jQuery.fn.extend({
 	},
 
 	clone: function( dataAndEvents, deepDataAndEvents ) {
-		dataAndEvents = dataAndEvents == null ? false : dataAndEvents;
-		deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents : deepDataAndEvents;
+		dataAndEvents = dataAndEvents == null ? false : dataAndEvents;  //是否克隆当前节点的事件及属性
+		deepDataAndEvents = deepDataAndEvents == null ? dataAndEvents : deepDataAndEvents; //是否克隆子节点的事件及属性
 
 		return this.map( function () {
 			return jQuery.clone( this, dataAndEvents, deepDataAndEvents );
@@ -5599,7 +5599,7 @@ jQuery.fn.extend({
 		return i ? this : this.remove();
 	},
 
-	detach: function( selector ) {
+	detach: function( selector ) {  //删除操作，但是保持当前节点的数据（data、事件）
 		return this.remove( selector, true );
 	},
 
@@ -5843,21 +5843,21 @@ jQuery.extend({
 		return fragment;
 	},
 
-	cleanData: function( elems ) {
+	cleanData: function( elems ) {  //清除节点数据
 		var data, elem, events, type, key, j,
 			special = jQuery.event.special,
 			i = 0;
 
 		for ( ; (elem = elems[ i ]) !== undefined; i++ ) {
 			if ( Data.accepts( elem ) ) {
-				key = elem[ data_priv.expando ];
+				key = elem[ data_priv.expando ]; //获取节点在data对象上的标识
 
 				if ( key && (data = data_priv.cache[ key ]) ) {
-					events = Object.keys( data.events || {} );
+					events = Object.keys( data.events || {} ); //事件的移除
 					if ( events.length ) {
 						for ( j = 0; (type = events[j]) !== undefined; j++ ) {
 							if ( special[ type ] ) {
-								jQuery.event.remove( elem, type );
+								jQuery.event.remove( elem, type ); 
 
 							// This is a shortcut to avoid jQuery.event.remove's overhead
 							} else {
@@ -5867,12 +5867,12 @@ jQuery.extend({
 					}
 					if ( data_priv.cache[ key ] ) {
 						// Discard any remaining `private` data
-						delete data_priv.cache[ key ];
+						delete data_priv.cache[ key ];  //移除私有data对象上缓存的数据
 					}
 				}
 			}
 			// Discard any remaining `user` data
-			delete data_user.cache[ elem[ data_user.expando ] ];
+			delete data_user.cache[ elem[ data_user.expando ] ];  //移除用户在节点上缓存的数据
 		}
 	},
 
