@@ -9,34 +9,34 @@
 
 (function(window,undefined){ 
 
-[(21 , 94) 定义了一些变量和函数，并初始化了jQ对象。jQuery = function(){};](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/1%E3%80%81jQuery%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96.md)
+[(21 , 94) 定义了一些变量和函数，并初始化了jQ对象。jQuery = function(){};](./doc/1%E3%80%81jQuery%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96.md)
 
-[(96 , 283) 给JQ对象，添加一些方法和属性](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/2%E3%80%81JQ%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95%E5%92%8C%E5%B1%9E%E6%80%A7.md)
+[(96 , 283) 给JQ对象，添加一些方法和属性](./doc/2%E3%80%81JQ%E5%AF%B9%E8%B1%A1%E6%B7%BB%E5%8A%A0%E4%B8%80%E4%BA%9B%E6%96%B9%E6%B3%95%E5%92%8C%E5%B1%9E%E6%80%A7.md)
 
-[(285 , 347) extend : JQ的扩展方法的函数](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/3%E3%80%81jQuery%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%A9%E5%B1%95--extend.md)
+[(285 , 347) extend : JQ的扩展方法的函数](./doc/3%E3%80%81jQuery%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%89%A9%E5%B1%95--extend.md)
 
-[(349 , 870) jQuery.extend() : 扩展一些工具方法](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/4%E3%80%81jQuery%E6%89%A9%E5%B1%95%E7%9A%84%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95.md)
+[(349 , 870) jQuery.extend() : 扩展一些工具方法](./doc/4%E3%80%81jQuery%E6%89%A9%E5%B1%95%E7%9A%84%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95.md)
 
 (877 , 2856)  Sizzle : 复杂选择器的实现 
 
-[(2880 , 3042) Callbacks : 回调对象 : 对函数的统一管理](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/5%E3%80%81Callback%E6%96%B9%E6%B3%95.md)
+[(2880 , 3042) Callbacks : 回调对象 : 对函数的统一管理](./doc/5%E3%80%81Callback%E6%96%B9%E6%B3%95.md)
 	
-[(3043 , 3183) Deferred : 延迟对象 : 对异步的统一管理](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/6%E3%80%81Deferred%E5%BB%B6%E8%BF%9F%E5%AF%B9%E8%B1%A1.md)
+[(3043 , 3183) Deferred : 延迟对象 : 对异步的统一管理](./doc/6%E3%80%81Deferred%E5%BB%B6%E8%BF%9F%E5%AF%B9%E8%B1%A1.md)
 
-[(3184 , 3295) support : 功能检测 : 对浏览器的功能检查](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/7%E3%80%81Support%E5%AF%B9%E8%B1%A1.md)
+[(3184 , 3295) support : 功能检测 : 对浏览器的功能检查](./doc/7%E3%80%81Support%E5%AF%B9%E8%B1%A1.md)
 
-[(3308 , 3652) data() : 数据缓存](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/8%E3%80%81Data%E7%BC%93%E5%AD%98%E5%AF%B9%E8%B1%A1.md)
+[(3308 , 3652) data() : 数据缓存](./doc/8%E3%80%81Data%E7%BC%93%E5%AD%98%E5%AF%B9%E8%B1%A1.md)
 
-[(3653 , 3797) queue() : 队列方法 : 执行顺序的管理 ](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/9%E3%80%81queue%E9%98%9F%E5%88%97%E5%AF%B9%E8%B1%A1.md)
+[(3653 , 3797) queue() : 队列方法 : 执行顺序的管理 ](./doc/9%E3%80%81queue%E9%98%9F%E5%88%97%E5%AF%B9%E8%B1%A1.md)
 
 (3803 , 4299) attr() prop() val() addClass()等 : 对元素属性的操作 :        
-1. [对元素属性的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E6%93%8D%E4%BD%9C.md)    
-2. [对元素Class名的操作](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/10-2%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0Class%E7%9A%84%E6%93%8D%E4%BD%9C.md)
+1. [对元素属性的操作](./doc/10%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E6%93%8D%E4%BD%9C.md)    
+2. [对元素Class名的操作](./doc/10-2%E3%80%81%E5%AF%B9%E5%85%83%E7%B4%A0Class%E7%9A%84%E6%93%8D%E4%BD%9C.md)
 
 (4300 , 5128) on() trigger() : 事件操作的相关方法 :
-1. [事件绑定机制](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-1%E3%80%81%E4%BA%8B%E4%BB%B6%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6.md)
-2. [事件函数的处理](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-2%E3%80%81%E4%BA%8B%E4%BB%B6%E5%87%BD%E6%95%B0%E7%9A%84%E5%A4%84%E7%90%86.md)
-3. [事件解绑和激活](https://github.com/Shenfq/Analyse-jQuery-source-code/blob/master/doc/11-3%E3%80%81%E4%BA%8B%E4%BB%B6%E8%A7%A3%E7%BB%91%E5%92%8C%E6%BF%80%E6%B4%BB.md)
+1. [事件绑定机制](./doc/11-1%E3%80%81%E4%BA%8B%E4%BB%B6%E7%BB%91%E5%AE%9A%E6%9C%BA%E5%88%B6.md)
+2. [事件函数的处理](./doc/11-2%E3%80%81%E4%BA%8B%E4%BB%B6%E5%87%BD%E6%95%B0%E7%9A%84%E5%A4%84%E7%90%86.md)
+3. [事件解绑和激活](./doc/11-3%E3%80%81%E4%BA%8B%E4%BB%B6%E8%A7%A3%E7%BB%91%E5%92%8C%E6%BF%80%E6%B4%BB.md)
 
 (5140 , 6057) DOM操作 : 添加 删除 获取 包装 DOM筛选 
 
