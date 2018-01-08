@@ -5311,7 +5311,7 @@ jQuery.each({
 	}
 }, function( name, fn ) {
 	jQuery.fn[ name ] = function( until, selector ) {
-		var matched = jQuery.map( this, fn, until );//先对节点进行一边过滤
+		var matched = jQuery.map( this, fn, until );//先对节点进行一遍过滤
 
 		if ( name.slice( -5 ) !== "Until" ) {
 			selector = until;  //判断是不是Until操作，并进行参数修正

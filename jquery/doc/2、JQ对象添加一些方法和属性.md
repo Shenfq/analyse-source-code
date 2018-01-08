@@ -1,5 +1,6 @@
 我们先看看jQuery的原型中初始化了哪些属性和方法：
 
+```javascript
     jQuery.fn = jQuery.prototype = {
     	jquery: core_version,  //jquery版本号
     
@@ -38,6 +39,8 @@
     	sort: [].sort,   //存储了数组的sort方法
     	splice: [].splice  //存储了数组的splice方法
     ｝
+
+```
 
 上面是对jQuery初始化的一些方法和属性的介绍，前面初始化jQuery对象时，我们可以看到jQuery对象其实是一个实例化的jQuery.fn.init，所以这里主要看下init是如何实现，其余的方法在具体用到的时候再看。
 

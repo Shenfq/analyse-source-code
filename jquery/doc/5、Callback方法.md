@@ -7,19 +7,19 @@
 - unique: 确保一次只能添加一个回调(所以在列表中没有重复的回调).
 - stopOnFalse: 当一个回调返回false 时中断调用
 	
+```javascript
+var optionsCache = {};
+//在创建Callbacks之前会创建一个对象用来缓存之前设定的属性值。
+function createOptions( options ) {
+	var object = optionsCache[ options ] = {};
+	jQuery.each( options.match( core_rnotwhite ) || [], function( _, flag ) {
+		object[ flag ] = true;
+	});
+	return object;
+}
 
-	var optionsCache = {};
-	//在创建Callbacks之前会创建一个对象用来缓存之前设定的属性值。
-	function createOptions( options ) {
-		var object = optionsCache[ options ] = {};
-		jQuery.each( options.match( core_rnotwhite ) || [], function( _, flag ) {
-			object[ flag ] = true;
-		});
-		return object;
-	}
 
-
-	jQuery.Callbacks = function( options ) {
+jQuery.Callbacks = function( options ) {
 
 	// Convert options from String-formatted to Object-formatted if needed
 	// (we check in cache first)
@@ -27,7 +27,7 @@
 	options = typeof options === "string" ?
 		( optionsCache[ options ] || createOptions( options ) ) :
 		jQuery.extend( {}, options );
-	
+
 	//此处定义了一些self对象将会使用的属性
 	var memory,fired,firing,firingStart,firingLength,firingIndex,
 		list = [], //一个回调函数的队列
@@ -85,12 +85,12 @@
 				return !!fired;
 			}
 		};
-	
+
 
 	//最后返回self对象。
 	return self;
-	};
-
+};
+```
 
 
 其实该对象主要使用的方法就是add、fire。
@@ -98,6 +98,7 @@
 
 **add:**
 
+```javascript
 	add: function() {  // 将一个回调函数添加到list队列
 		if ( list ) {
 			// First, we save the current length
@@ -126,7 +127,7 @@
 		return this;
 	}
 
-
+```
 
 ----------
 
@@ -134,6 +135,7 @@
 
 fire一共定义了两次，一次实在self对象中，在初始化self对象之前也定义了一个fire函数，其实观察源码后就会发现，self对象中的fire方法最后就是调用的之前定义的fire函数。
 
+```javascript
 	fireWith: function( context, args ) {   
 		if ( list && ( !fired || stack ) ) {
 			args = args || [];
@@ -153,10 +155,11 @@ fire一共定义了两次，一次实在self对象中，在初始化self对象�
 		self.fireWith( this, arguments );
 		return this;
 	}
-
+```
 
 最后看看self之前定义的fire函数主要实现了什么功能：
 
+```javascript
 	fire = function( data ) {
 		//只有memory为true时才记录data
 		memory = options.memory && data;
@@ -185,7 +188,7 @@ fire一共定义了两次，一次实在self对象中，在初始化self对象�
 			}
 		}
 	}
-
+```
 
 
 
@@ -198,6 +201,7 @@ fire一共定义了两次，一次实在self对象中，在初始化self对象�
 
 如：
 
+```javascript
 		function fn1(val) {
 			console.log(val);
 		}
@@ -216,4 +220,4 @@ fire一共定义了两次，一次实在self对象中，在初始化self对象�
 
 		Def.add( fn1 );  //1
 		Def.fire( "4" );
-
+```
