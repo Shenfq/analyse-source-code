@@ -5444,7 +5444,7 @@ jQuery.fn.extend({
 	text: function( value ) {
 		return jQuery.access( this, function( value ) {
 			return value === undefined ?
-				jQuery.text( this ) :
+				jQuery.text( this ) :  //获取innerText
 				this.empty().append( ( this[ 0 ] && this[ 0 ].ownerDocument || document ).createTextNode( value ) );
 		}, null, value, arguments.length );
 	},
@@ -5605,7 +5605,7 @@ jQuery.fn.extend({
 
 	domManip: function( args, callback, allowIntersection ) {
 
-		// Flatten any nested arrays
+		// Flatten any nested arrays  将argument转换为数组
 		args = core_concat.apply( [], args );
 
 		var fragment, first, scripts, hasScripts, node, doc,
@@ -5621,10 +5621,10 @@ jQuery.fn.extend({
 			return this.each(function( index ) {
 				var self = set.eq( index );
 				if ( isFunction ) {
-					args[ 0 ] = value.call( this, index, self.html() );
+					args[ 0 ] = value.call( this, index, self.html() ); //如果是函数，先获取函数返回值，重新调用domManip方法
 				}
 				self.domManip( args, callback, allowIntersection );
-			});
+			}); 
 		}
 
 		if ( l ) {
@@ -5760,11 +5760,11 @@ jQuery.extend({
 		var elem, tmp, tag, wrap, contains, j,
 			i = 0,
 			l = elems.length,
-			fragment = context.createDocumentFragment(),
+			fragment = context.createDocumentFragment(), //构建文档碎片
 			nodes = [];
 
 		for ( ; i < l; i++ ) {
-			elem = elems[ i ];
+			elem = elems[ i ]; //遍历dom节点
 
 			if ( elem || elem === 0 ) {
 
@@ -5774,15 +5774,15 @@ jQuery.extend({
 					// jQuery.merge because core_push.apply(_, arraylike) throws
 					jQuery.merge( nodes, elem.nodeType ? [ elem ] : elem );
 
-				// Convert non-html into a text node
-				} else if ( !rhtml.test( elem ) ) {
+				// Convert non-html into a text node 如果是非html字符串，使用createTextNode构建文本节点
+				} else if ( !rhtml.test( elem ) ) { 
 					nodes.push( context.createTextNode( elem ) );
 
-				// Convert html into DOM nodes
+				// Convert html into DOM nodes 把html文本构建为dom节点
 				} else {
-					tmp = tmp || fragment.appendChild( context.createElement("div") );
+					tmp = tmp || fragment.appendChild( context.createElement("div") ); //创建一个div到文档碎片中，作为占位符
 
-					// Deserialize a standard representation
+					// Deserialize a standard representation  进行反序列化
 					tag = ( rtagName.exec( elem ) || ["", ""] )[ 1 ].toLowerCase();
 					wrap = wrapMap[ tag ] || wrapMap._default;
 					tmp.innerHTML = wrap[ 1 ] + elem.replace( rxhtmlTag, "<$1></$2>" ) + wrap[ 2 ];
@@ -5806,7 +5806,7 @@ jQuery.extend({
 				}
 			}
 		}
-
+		
 		// Remove wrapper from fragment
 		fragment.textContent = "";
 
@@ -5889,7 +5889,7 @@ jQuery.extend({
 });
 
 // Support: 1.x compatibility
-// Manipulating tables requires a tbody
+// Manipulating tables requires a tbody 不能直接向tabel元素插入tr，必须切换为tbody
 function manipulationTarget( elem, content ) {
 	return jQuery.nodeName( elem, "table" ) &&
 		jQuery.nodeName( content.nodeType === 1 ? content : content.firstChild, "tr" ) ?
