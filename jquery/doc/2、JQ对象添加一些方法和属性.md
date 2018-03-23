@@ -143,6 +143,7 @@ exec方法用于正则匹配，返回一个数组，第一个元素是匹配到�
 
 举个栗子：
 
+```javascript
 	var rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/;
 
 	console.log( match = rquickExpr.exec( '<ul><li></li></ul>' )  );
@@ -150,7 +151,7 @@ exec方法用于正则匹配，返回一个数组，第一个元素是匹配到�
 
 	console.log( match = rquickExpr.exec( '#id' )  );
 	// ["#id", undefined, "id"]
-
+```
 
 现在我们知道了，match其实就是存储了字符串含义的数组，不得不感叹这是人想出来的吗。正则懵逼。
 
