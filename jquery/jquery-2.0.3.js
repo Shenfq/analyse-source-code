@@ -6131,9 +6131,9 @@ function showHide( elements, show ) {
 				elem.style.display = "";
 			}
 
-			// Set elements which have been overridden with display: none
-			// in a stylesheet to whatever the default browser style is
-			// for such an element
+			// 重置已被display: none覆盖的元素
+			// 获取这样的元素
+			// 在浏览器下display的默认样式
 			if ( elem.style.display === "" && isHidden( elem ) ) { //如果之前被隐藏了，通过css_defaultDisplay获取默认值
 				values[ index ] = data_priv.access( elem, "olddisplay", css_defaultDisplay(elem.nodeName) );
 			}
