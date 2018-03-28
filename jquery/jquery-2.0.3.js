@@ -6097,16 +6097,16 @@ function vendorPropName( style, name ) {
 	return origName;
 }
 
-function isHidden( elem, el ) {
+function isHidden( elem, el ) { //判断元素是否被隐藏，display为none或者当前元素不在document中
 	// isHidden might be called from jQuery#filter function;
 	// in that case, element will be second argument
-	elem = el || elem;
+	elem = el || elem; //该函数可能通过 filter 方法调用，会传入两个参数 index和el，这里做了兼容处理
 	return jQuery.css( elem, "display" ) === "none" || !jQuery.contains( elem.ownerDocument, elem );
 }
 
 // NOTE: we've included the "window" in window.getComputedStyle
 // because jsdom on node.js will break without it.
-function getStyles( elem ) {
+function getStyles( elem ) { //获取元素的样式表
 	return window.getComputedStyle( elem, null );
 }
 
@@ -6123,10 +6123,10 @@ function showHide( elements, show ) {
 		}
 
 		values[ index ] = data_priv.get( elem, "olddisplay" );
-		display = elem.style.display;
+		display = elem.style.display; //获取当前状态
 		if ( show ) {
-			// Reset the inline display of this element to learn if it is
-			// being hidden by cascaded rules or not
+			// 重置元素的内联样式display属性
+			// 这样才能知道该元素是不是被内联样式隐藏了
 			if ( !values[ index ] && display === "none" ) {
 				elem.style.display = "";
 			}
@@ -6134,7 +6134,7 @@ function showHide( elements, show ) {
 			// Set elements which have been overridden with display: none
 			// in a stylesheet to whatever the default browser style is
 			// for such an element
-			if ( elem.style.display === "" && isHidden( elem ) ) {
+			if ( elem.style.display === "" && isHidden( elem ) ) { //如果之前被隐藏了，通过css_defaultDisplay获取默认值
 				values[ index ] = data_priv.access( elem, "olddisplay", css_defaultDisplay(elem.nodeName) );
 			}
 		} else {
@@ -6142,22 +6142,22 @@ function showHide( elements, show ) {
 			if ( !values[ index ] ) {
 				hidden = isHidden( elem );
 
-				if ( display && display !== "none" || !hidden ) {
+				if ( display && display !== "none" || !hidden ) { //将之前显示的初始值进行缓存
 					data_priv.set( elem, "olddisplay", hidden ? display : jQuery.css(elem, "display") );
 				}
 			}
 		}
 	}
 
-	// Set the display of most of the elements in a second loop
-	// to avoid the constant reflow
+	// 进行第二次遍历来设置元素的display状态
+	// 避免DOM的不断回流
 	for ( index = 0; index < length; index++ ) {
 		elem = elements[ index ];
 		if ( !elem.style ) {
 			continue;
 		}
 		if ( !show || elem.style.display === "none" || elem.style.display === "" ) {
-			elem.style.display = show ? values[ index ] || "" : "none";
+			elem.style.display = show ? values[ index ] || "" : "none";  //显示置为初始值，隐藏置为noon
 		}
 	}
 
@@ -6171,7 +6171,7 @@ jQuery.fn.extend({
 				map = {},
 				i = 0;
 
-			if ( jQuery.isArray( name ) ) {
+			if ( jQuery.isArray( name ) ) {  //如果是数组表示获取多个css属性，返回一个json
 				styles = getStyles( elem );
 				len = name.length;
 
@@ -6183,22 +6183,22 @@ jQuery.fn.extend({
 			}
 
 			return value !== undefined ?
-				jQuery.style( elem, name, value ) :
-				jQuery.css( elem, name );
+				jQuery.style( elem, name, value ) : //设置css调用style方法
+				jQuery.css( elem, name ); //获取css调用css方法
 		}, name, value, arguments.length > 1 );
 	},
-	show: function() {
+	show: function() { //显示
 		return showHide( this, true );
 	},
-	hide: function() {
+	hide: function() { //隐藏
 		return showHide( this );
 	},
 	toggle: function( state ) {
-		if ( typeof state === "boolean" ) {
+		if ( typeof state === "boolean" ) { //通过state参数调整元素的显隐状态
 			return state ? this.show() : this.hide();
 		}
 
-		return this.each(function() {
+		return this.each(function() { //遍历所有元素，切换显隐状态
 			if ( isHidden( this ) ) {
 				jQuery( this ).show();
 			} else {
@@ -6307,7 +6307,7 @@ jQuery.extend({
 
 	css: function( elem, name, extra, styles ) {
 		var val, num, hooks,
-			origName = jQuery.camelCase( name );
+			origName = jQuery.camelCase( name ); //转为驼峰表示法
 
 		// Make sure that we're working with the right name
 		name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( elem.style, origName ) );
@@ -6472,16 +6472,16 @@ function getWidthOrHeight( elem, name, extra ) {
 }
 
 // Try to determine the default display value of an element
-function css_defaultDisplay( nodeName ) {
+function css_defaultDisplay( nodeName ) { //获取一个元素的默认display
 	var doc = document,
-		display = elemdisplay[ nodeName ];
+		display = elemdisplay[ nodeName ]; //获取缓存中的display默认值
 
 	if ( !display ) {
-		display = actualDisplay( nodeName, doc );
+		display = actualDisplay( nodeName, doc ); //通过把dom插入到document.body的方式来获取display的值
 
 		// If the simple way fails, read from inside an iframe
-		if ( display === "none" || !display ) {
-			// Use the already-created iframe if possible
+		if ( display === "none" || !display ) { //可能DOMTag的样式被改写获取的display有问题，放到iframe中重新获取
+			// 尽可能的使用只读的iframe
 			iframe = ( iframe ||
 				jQuery("<iframe frameborder='0' width='0' height='0'/>")
 				.css( "cssText", "display:block !important" )
@@ -6496,7 +6496,7 @@ function css_defaultDisplay( nodeName ) {
 			iframe.detach();
 		}
 
-		// Store the correct default display
+		// 得到后放入elemdispaly中进行缓存，下次不用再次获取
 		elemdisplay[ nodeName ] = display;
 	}
 
@@ -6507,7 +6507,7 @@ function css_defaultDisplay( nodeName ) {
 function actualDisplay( name, doc ) {
 	var elem = jQuery( doc.createElement( name ) ).appendTo( doc.body ),
 		display = jQuery.css( elem[0], "display" );
-	elem.remove();
+	elem.remove(); //获取完毕后，移除节点
 	return display;
 }
 
