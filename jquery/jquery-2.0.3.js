@@ -6074,7 +6074,7 @@ var curCSS, iframe,
 	cssExpand = [ "Top", "Right", "Bottom", "Left" ],
 	cssPrefixes = [ "Webkit", "O", "Moz", "ms" ];
 
-// return a css property mapped to a potentially vendor prefixed property
+// 返回一个css属性，具有正确的浏览器私有前缀
 function vendorPropName( style, name ) {
 
 	// shortcut for names that are not vendor prefixed
@@ -6082,7 +6082,7 @@ function vendorPropName( style, name ) {
 		return name;
 	}
 
-	// check for vendor prefixed names
+	// 检查各个浏览器的私有前缀
 	var capName = name.charAt(0).toUpperCase() + name.slice(1),
 		origName = name,
 		i = cssPrefixes.length;
@@ -6309,19 +6309,19 @@ jQuery.extend({
 		var val, num, hooks,
 			origName = jQuery.camelCase( name ); //转为驼峰表示法
 
-		// Make sure that we're working with the right name
+		// 获取能够正确工作 css属性
 		name = jQuery.cssProps[ origName ] || ( jQuery.cssProps[ origName ] = vendorPropName( elem.style, origName ) );
 
-		// gets hook for the prefixed version
-		// followed by the unprefixed version
+		// 获取带前缀的css属性的hook
+		// 其次获取不带前缀的css属性的hook
 		hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
 
-		// If a hook was provided get the computed value from there
-		if ( hooks && "get" in hooks ) {
+		// 如果有hook，通过hook的get方法获取css属性值
+		if ( hooks && "get" in hooks ) { //有些 css 样式需要通过hook的方式获得
 			val = hooks.get( elem, true, extra );
 		}
 
-		// Otherwise, if a way to get the computed value exists, use that
+		// 如果之前没有获取到，通过curCSS方法获取属性值
 		if ( val === undefined ) {
 			val = curCSS( elem, name, styles );
 		}
@@ -6342,13 +6342,13 @@ jQuery.extend({
 
 curCSS = function( elem, name, _computed ) {
 	var width, minWidth, maxWidth,
-		computed = _computed || getStyles( elem ),
+		computed = _computed || getStyles( elem ), //获取当前元素的样式表，有时候会从外部传入，没有就自己去查
 
 		// Support: IE9
 		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
 		ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undefined,
 		style = elem.style;
-
+	//这一部分主要就是为了做兼容处理
 	if ( computed ) {
 
 		if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {

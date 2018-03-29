@@ -106,6 +106,7 @@ init对传入的选择器进行了以下的区分：
 
 下面我们来看当 selector 为一个字符串时是如何进行处理的：
 
+```javascript
     if ( selector.charAt(0) === "<" && selector.charAt( selector.length - 1 ) === ">" && selector.length >= 3 ) {//匹配单标签
     	match = [ null, selector, null ];
     } else {
@@ -132,6 +133,7 @@ init对传入的选择器进行了以下的区分：
     } else {
     	return this.constructor( context ).find( selector );
     }
+```
 
 看这段代码前我们要先弄懂match到底是什么东西
 
