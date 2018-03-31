@@ -6175,7 +6175,7 @@ jQuery.fn.extend({
 				styles = getStyles( elem );
 				len = name.length;
 
-				for ( ; i < len; i++ ) {
+				for (; i < len; i++) { //遍历属性名，获取放到map中，一次性返回
 					map[ name[ i ] ] = jQuery.css( elem, name[ i ], false, styles );
 				}
 
@@ -6345,12 +6345,12 @@ curCSS = function( elem, name, _computed ) {
 		computed = _computed || getStyles( elem ), //获取当前元素的样式表，有时候会从外部传入，没有就自己去查
 
 		// Support: IE9
-		// getPropertyValue is only needed for .css('filter') in IE9, see #12537
+		// getPropertyValue方法不支持驼峰式的css属性名，先通过该方法获取，是因为ie下获取filter只能通过该方法
 		ret = computed ? computed.getPropertyValue( name ) || computed[ name ] : undefined,
 		style = elem.style;
 	//这一部分主要就是为了做兼容处理
 	if ( computed ) {
-
+		//该元素不在DOM中，表示动态创建的，使用style方法获取属性值
 		if ( ret === "" && !jQuery.contains( elem.ownerDocument, elem ) ) {
 			ret = jQuery.style( elem, name );
 		}
