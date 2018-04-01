@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="box">
+    
+  </div>
+  <script type="text/javascript" src="../jquery-2.0.3.js"></script>
+  <script type="text/javascript">
+    var $box = $('#box')
+    $box.css({
+      color: 'red',
+      width: 100,
+      height: 100,
+      background: 'red'
+    })
+
+    console.log(
+      $box.css([
+        'color', 'width', 'background'
+      ])
+    )
+
+    var 
+        core_pnum = /[+-]?(?:\d*\.|)\d+(?:[eE][+-]?\d+|)/.source,
+        rnumsplit = new RegExp("^(" + core_pnum + ")(.*)$", "i"),
+        rnumnonpx = new RegExp("^(" + core_pnum + ")(?!px)[a-z%]+$", "i"),
+        rrelNum = new RegExp("^([+-])=(" + core_pnum + ")", "i")
+
+    console.log(rrelNum.exec('-=123'))
+
+
+    var x = $('<div>'); 
+    x.css('backgroundImage', 'url("/x.png")');
+
+    var y = x.clone(); 
+    y.css('backgroundImage', ''); //bug: this clears x's backgroundImage
+   
+    console.log(
+      x.css('backgroundImage'), 
+      y.css('backgroundImage')
+    );
+  </script>
+</body>
+
+</html>
