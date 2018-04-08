@@ -77,12 +77,12 @@ Deferred: function( func ) {
 
 ```javascript
 tuples = [
-			这三个数组每一项分别代表着不同的含义：
-			执行操作, 添加回调的方法名, 监听队列, 结束状态
-			[ "resolve", "done", jQuery.Callbacks("once memory"), "resolved" ],
-			[ "reject", "fail", jQuery.Callbacks("once memory"), "rejected" ],
-			[ "notify", "progress", jQuery.Callbacks("memory") ]
-		]
+	// 这三个数组每一项分别代表着不同的含义：
+	// 执行操作, 添加回调的方法名, 监听队列, 结束状态
+	[ "resolve", "done", jQuery.Callbacks("once memory"), "resolved" ],
+	[ "reject", "fail", jQuery.Callbacks("once memory"), "rejected" ],
+	[ "notify", "progress", jQuery.Callbacks("memory") ]
+]
 ```
 
 
@@ -90,10 +90,13 @@ tuples = [
 
 ```javascript
 jQuery.each( tuples, function( i, tuple ) {
-	var list = tuple[ 2 ],  //list为一个Callbacks对象，且resolve和reject的Callbacks状态为  'once memory'，该状态表示回调队列fire一次都每次添加的回调都会自动激活然后清空回调队列
-		stateString = tuple[ 3 ];  //状态信息。只有成功(done)和失败(fail)才有状态信息
+  // list为一个Callbacks对象，且resolve和reject的Callbacks状态为  'once memory'，
+  // 该状态表示回调队列fire一次都每次添加的回调都会自动激活然后清空回调队列
+	var list = tuple[ 2 ],  
+		  stateString = tuple[ 3 ];  //状态信息。只有成功(done)和失败(fail)才有状态信息
 
-	// promise[ done | fail | progress ] = list.add   Deferred的done和fail方法就是状态为  'once memory' 的Callbacks对象的add方法。
+  // promise[ done | fail | progress ] = list.add   
+  // Deferred的done和fail方法就是状态为  'once memory' 的Callbacks对象的add方法。
 	promise[ tuple[1] ] = list.add;
 
 	// Handle state
@@ -102,12 +105,15 @@ jQuery.each( tuples, function( i, tuple ) {
 			// state = [ resolved | rejected ]   改变状态
 			state = stateString;
 
-		// 这里表示当状态为resolve时，就注销fail上的回调，锁定progress；状态为reject时，注销done上的回调，锁定progress     使用了异或方法,  0^1==1   1^1==0
+    // 这里表示当状态为resolve时，就注销fail上的回调，锁定progress；
+    // 状态为reject时，注销done上的回调，锁定progress     
+    // 使用了异或方法,  0^1==1   1^1==0
 		}, tuples[ i ^ 1 ][ 2 ].disable, tuples[ 2 ][ 2 ].lock );
 	}
-	//扩展了6个方法： resolve | reject | notify  、   resolveWith | rejectWith | notifyWith    就是Callbacks中的fire方法和fireWith方法
+  // 扩展了6个方法： resolve | reject | notify 、resolveWith | rejectWith | notifyWith    
+  // 就是Callbacks中的fire方法和fireWith方法
 	// deferred[ resolve | reject | notify ]
-	deferred[ tuple[0] ] = function() {
+	deferred[ tuple[0] ] = function() { //用来支持链式调用
 		deferred[ tuple[0] + "With" ]( this === deferred ? promise : this, arguments );
 		return this;
 	};

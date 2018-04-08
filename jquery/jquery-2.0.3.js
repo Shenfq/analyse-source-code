@@ -3088,7 +3088,7 @@ jQuery.extend({
 			},
 			deferred = {};
 
-		// Keep pipe for back-compat
+		// Keep pipe for back-compat 保持向后兼容
 		promise.pipe = promise.then;
 
 		// Add list-specific methods   遍历之前的状态数组，并添加相应状态的方法
@@ -3110,7 +3110,7 @@ jQuery.extend({
 			}
 			//扩展了6个方法： resolve | reject | notify  、   resolveWith | rejectWith | notifyWith    就是Callbacks中的fire方法和fireWith方法
 			// deferred[ resolve | reject | notify ]   	//状态改变后，之后添加的回调都会立即调用
-			deferred[ tuple[0] ] = function() {
+			deferred[ tuple[0] ] = function() { //用来支持链式调用
 				deferred[ tuple[0] + "With" ]( this === deferred ? promise : this, arguments );
 				return this;
 			};
