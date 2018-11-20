@@ -29,7 +29,7 @@ const deprecate = require('depd')('koa');
 
 module.exports = class Application extends Emitter {
   /**
-   * Initialize a new `Application`.
+   * 初始化一个新的`应用`
    *
    * @api public
    */
@@ -61,6 +61,7 @@ module.exports = class Application extends Emitter {
 
   listen(...args) {
     debug('listen');
+    // koa内部其实还是调用node自带的http服务
     const server = http.createServer(this.callback());
     return server.listen(...args);
   }
@@ -104,6 +105,7 @@ module.exports = class Application extends Emitter {
 
   use(fn) {
     if (typeof fn !== 'function') throw new TypeError('middleware must be a function!');
+    // 判断是否为生成器方法，如果是此方法，需要提示这种用法在下个版本会被抛弃
     if (isGeneratorFunction(fn)) {
       deprecate('Support for generators will be removed in v3. ' +
                 'See the documentation for examples of how to convert old middleware ' +
@@ -111,24 +113,25 @@ module.exports = class Application extends Emitter {
       fn = convert(fn);
     }
     debug('use %s', fn._name || fn.name || '-');
+    // 将中间件函数放入middleware栈中
     this.middleware.push(fn);
     return this;
   }
 
   /**
-   * Return a request handler callback
-   * for node's native http server.
+   * 返回一个回调函数，用于处理node原生的http请求.
    *
    * @return {Function}
    * @api public
    */
 
   callback() {
-    const fn = compose(this.middleware);
+    const fn = compose(this.middleware); // 用于生成koa的洋葱模型
 
     if (!this.listenerCount('error')) this.on('error', this.onerror);
 
     const handleRequest = (req, res) => {
+      // 创建ctx对象，该对象贯穿整个koa，根据http类提供的req和res对象生成
       const ctx = this.createContext(req, res);
       return this.handleRequest(ctx, fn);
     };
