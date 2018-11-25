@@ -2,7 +2,7 @@
 'use strict';
 
 /**
- * Module dependencies.
+ * 依赖的模块.
  */
 
 const isGeneratorFunction = require('is-generator-function');
@@ -50,7 +50,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Shorthand for:
+   * 简写方式如下:
    *
    *    http.createServer(app.callback()).listen(...)
    *
@@ -140,7 +140,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Handle request in callback.
+   * 用于生成http服务的回调函数.
    *
    * @api private
    */
@@ -155,7 +155,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Initialize a new context.
+   * 初始化一个新的ctx对象.
    *
    * @api private
    */
@@ -176,7 +176,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Default error handler.
+   * 默认的错误处理方法.
    *
    * @param {Error} err
    * @api private
@@ -196,7 +196,7 @@ module.exports = class Application extends Emitter {
 };
 
 /**
- * Response helper.
+ * 处理http的返回.
  */
 
 function respond(ctx) {
@@ -209,7 +209,7 @@ function respond(ctx) {
   let body = ctx.body;
   const code = ctx.status;
 
-  // ignore body
+  // 处理一些返回为空的状态码
   if (statuses.empty[code]) {
     // strip headers
     ctx.body = null;
@@ -223,7 +223,7 @@ function respond(ctx) {
     return res.end();
   }
 
-  // status body
+  // body为空时，根据状态码给body赋值
   if (null == body) {
     if (ctx.req.httpVersionMajor >= 2) {
       body = String(code);
@@ -237,12 +237,12 @@ function respond(ctx) {
     return res.end(body);
   }
 
-  // responses
+  // 对buffer、stream、字符串进行不同的返回方式
   if (Buffer.isBuffer(body)) return res.end(body);
   if ('string' == typeof body) return res.end(body);
   if (body instanceof Stream) return body.pipe(res);
 
-  // body: json
+  // 对json进行处理
   body = JSON.stringify(body);
   if (!res.headersSent) {
     ctx.length = Buffer.byteLength(body);
