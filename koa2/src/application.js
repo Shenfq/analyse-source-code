@@ -67,8 +67,8 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Return JSON representation.
-   * We only bother showing settings.
+   * 返回一个JSON.
+   * 该api只会显示配置相关字段.
    *
    * @return {Object}
    * @api public
@@ -83,7 +83,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Inspect implementation.
+   * 用于测试.
    *
    * @return {Object}
    * @api public
@@ -94,7 +94,7 @@ module.exports = class Application extends Emitter {
   }
 
   /**
-   * Use the given middleware `fn`.
+   * 将中间件放对队列中.
    *
    * Old-style middleware will be converted.
    *
@@ -113,7 +113,7 @@ module.exports = class Application extends Emitter {
       fn = convert(fn);
     }
     debug('use %s', fn._name || fn.name || '-');
-    // 将中间件函数放入middleware栈中
+    // 将中间件函数放入middleware队列中
     this.middleware.push(fn);
     return this;
   }
@@ -150,7 +150,7 @@ module.exports = class Application extends Emitter {
     res.statusCode = 404;
     const onerror = err => ctx.onerror(err);
     const handleResponse = () => respond(ctx);
-    onFinished(res, onerror);
+    onFinished(res, onerror); // 用于检测node的http服务是否异常，如果异常也会调用onerror处理异常
     return fnMiddleware(ctx).then(handleResponse).catch(onerror);
   }
 

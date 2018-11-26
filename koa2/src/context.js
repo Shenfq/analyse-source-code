@@ -185,7 +185,7 @@ if (util.inspect.custom) {
 }
 
 /**
- * Response delegation.
+ * 响应体代理.
  */
 
 delegate(proto, 'response')
@@ -207,7 +207,7 @@ delegate(proto, 'response')
   .getter('writable');
 
 /**
- * Request delegation.
+ * 请求体代理.
  */
 
 delegate(proto, 'request')

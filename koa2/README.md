@@ -51,13 +51,13 @@ use(fn) {
     deprecate('Support for generators will be removed in v3. ')
     fn = convert(fn);
   }
-  // 将中间件函数放入middleware栈中
+  // 将中间件函数放入middleware队列中
   this.middleware.push(fn);
   return this;
 }
 ```
 
-首先需要判断传入的中间件是否为一个函数，koa1的版本传入的为迭代器来做异步操作，且需要使用`convert`进行包装，koa2的中间件使用`async function`，然后将这些中间件函数放入middleware栈中。
+首先需要判断传入的中间件是否为一个函数，koa1的版本传入的为迭代器来做异步操作，且需要使用`convert`进行包装，koa2的中间件使用`async function`，然后将这些中间件函数放入middleware队列中。
 
 ## 启动http服务
 
@@ -157,7 +157,221 @@ createContext(req, res) {
 }
 ```
 
-这里基本上是几个对象之间的相互挂载，进行了一系列的循环引用，为使用者提供方便。
+这里基本上是几个对象之间的相互挂载，进行了一系列的循环引用，为使用者提供方便。这里最后返回的context对象就是我们在koa中间件中使用的ctx对象。
 
-// todo ctx对象的代理
+```javascript
+const context = require('./context');
+const context = Object.create(this.context)
+```
 
+可以看到这里的context对象继承自[context.js](./src/context.js)暴露的对象，查看起代码可以发现，context对象通过delegate方法，将response和request上的一些属于与方法代理到了自生上。
+
+```javascript
+/**
+ * 响应体代理.
+ */
+const proto = module.exports = { 
+  //... 
+};
+delegate(proto, 'response')
+  .method('attachment')
+  .method('redirect')
+  .method('remove')
+  .method('vary')
+  .method('set')
+  .method('append')
+  .method('flushHeaders')
+  .access('status')
+  .access('message')
+  .access('body')
+  .access('length')
+  .access('type')
+  .access('lastModified')
+  .access('etag')
+  .getter('headerSent')
+  .getter('writable');
+
+/**
+ * 请求体代理.
+ */
+
+delegate(proto, 'request')
+  .method('acceptsLanguages')
+  .method('acceptsEncodings')
+  .method('acceptsCharsets')
+  .method('accepts')
+  .method('get')
+  .method('is')
+  .access('querystring')
+  .access('idempotent')
+  .access('socket')
+  .access('search')
+  .access('method')
+  .access('query')
+  .access('path')
+  .access('url')
+  .access('accept')
+  .getter('origin')
+  .getter('href')
+  .getter('subdomains')
+  .getter('protocol')
+  .getter('host')
+  .getter('hostname')
+  .getter('URL')
+  .getter('header')
+  .getter('headers')
+  .getter('secure')
+  .getter('stale')
+  .getter('fresh')
+  .getter('ips')
+  .getter('ip');
+```
+
+
+这里的代码很简单，就是将context的request和response的一些属性和方法直接代理到context本身上。下面简单看看delegate这个库做的事情。
+
+```javascript
+// 构造函数
+function Delegator(proto, target) {
+  // 非new调用时，自动进行实例化
+  if (!(this instanceof Delegator)) return new Delegator(proto, target);
+  this.proto = proto;
+  this.target = target;
+}
+
+// 从targe上委托一方法到proto上.
+Delegator.prototype.method = function(name){
+  var proto = this.proto;
+  var target = this.target;
+  proto[name] = function(){
+    return this[target][name].apply(this[target], arguments);
+  };
+  return this;
+};
+
+// 代理一个可访问又可设置的属性.
+Delegator.prototype.access = function(name){
+  return this.getter(name).setter(name);
+};
+
+//代理一个可访问的属性.
+Delegator.prototype.getter = function(name){
+  var proto = this.proto;
+  var target = this.target;
+  proto.__defineGetter__(name, function(){
+    return this[target][name];
+  });
+  return this;
+};
+
+// 代理一个可设置的属性.
+Delegator.prototype.setter = function(name){
+  var proto = this.proto;
+  var target = this.target;
+  proto.__defineSetter__(name, function(val){
+    return this[target][name] = val;
+  });
+  return this;
+};
+```
+
+注意这里用到的`__defineGetter__`和`__defineSetter__`都是v8引擎带的对象方向，并不属于web标准（之前有过提案，但是后面已经从 Web 标准中删除）。
+
+然后在request对象和response对象中，通过getter和setter设置了很多属性，就是获取或者设置node的http服务的原生对象（req、rsp）。
+
+这里列举几个常用的属性：
+
+- request
+
+```javascript
+module.exports = {
+  // 获取请求体的某个字段，兼容referer写法
+  get(field) {
+    const req = this.req;
+    switch (field = field.toLowerCase()) {
+      case 'referer':
+      case 'referrer':
+        return req.headers.referrer || req.headers.referer || '';
+      default:
+        return req.headers[field] || '';
+    }
+  },
+  // 获取http请求的method
+  get method() {
+    return this.req.method;
+  },
+  // 获取请求参数
+  get query() {
+    const str = this.querystring;
+    const c = this._querycache = this._querycache || {};
+    return c[str] || (c[str] = qs.parse(str));
+  },
+  get querystring() {
+    if (!this.req) return '';
+    return parse(this.req).query || '';
+  }
+
+  // 其他关于http请求体的相关属性（header、origin、accept、ip……）就不一一列举了
+}
+```
+
+- response
+
+```javascript
+module.exports = {
+  // 最常用的就是对body进行设置
+  set body(val) {
+    const original = this._body;
+    this._body = val;
+
+    // no content
+    if (null == val) {
+      if (!statuses.empty[this.status]) this.status = 204;
+      this.remove('Content-Type');
+      this.remove('Content-Length');
+      this.remove('Transfer-Encoding');
+      return;
+    }
+
+    // set the status
+    if (!this._explicitStatus) this.status = 200;
+
+    // set the content-type only if not yet set
+    const setType = !this.header['content-type'];
+
+    // string
+    if ('string' == typeof val) {
+      if (setType) this.type = /^\s*</.test(val) ? 'html' : 'text';
+      this.length = Buffer.byteLength(val);
+      return;
+    }
+
+    // buffer
+    if (Buffer.isBuffer(val)) {
+      if (setType) this.type = 'bin';
+      this.length = val.length;
+      return;
+    }
+
+    // stream
+    if ('function' == typeof val.pipe) {
+      onFinish(this.res, destroy.bind(null, val));
+      ensureErrorHandler(val, err => this.ctx.onerror(err));
+
+      // overwriting
+      if (null != original && original != val) this.remove('Content-Length');
+
+      if (setType) this.type = 'bin';
+      return;
+    }
+
+    // json
+    this.remove('Content-Length');
+    this.type = 'json';
+  },
+}
+```
+
+关于http请求体和响应体设置的属性比较多，这里就不一一列举了，最后在看看ctx对象和req、rsp直接的关系吧。
+
+![ctx](./images/ctx.png)
