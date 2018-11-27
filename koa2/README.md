@@ -133,6 +133,14 @@ dispatch.bind(null, i + 1)
 
 可以看到next方法其实就是递归调用下一个中间件函数。还有一点需要注意dispatch方法返回的是Promise对象，因为我们在使用koa的时候，中间件都是`async function`，而且调用next的时候使用的是`await next()`，这里必须返回的是一个Promise对象。
 
+下面初始化了三个中间件，然后具体执行流程看下图。
+
+![执行middleware](./images/middleware.jpg)
+
+执行结果如下
+
+![执行结果](./images/middleware_result.jpg)
+
 ## ctx对象
 
 看完洋葱模型之后看看koa的另一个重点，ctx对象。该对象是通过http服务的回调函数传入的`req`、`res`两个对象生成的。
