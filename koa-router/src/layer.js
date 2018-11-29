@@ -5,6 +5,7 @@ var uri = require('urijs');
 module.exports = Layer;
 
 /**
+ * 根据给的的路径`path`、方法`method`和中间件`middleware`，初始化一个新的路由层
  * Initialize a new routing Layer with given `method`, `path`, and `middleware`.
  *
  * @param {String|RegExp} path Path string or regular expression.
@@ -27,7 +28,7 @@ function Layer(path, methods, middleware, opts) {
 
   methods.forEach(function(method) {
     var l = this.methods.push(method.toUpperCase());
-    if (this.methods[l-1] === 'GET') {
+    if (this.methods[l-1] === 'GET') { // 如果是get请求，加上一个head请求
       this.methods.unshift('HEAD');
     }
   }, this);
@@ -44,13 +45,13 @@ function Layer(path, methods, middleware, opts) {
   }, this);
 
   this.path = path;
-  this.regexp = pathToRegExp(path, this.paramNames, this.opts);
+  this.regexp = pathToRegExp(path, this.paramNames, this.opts); // 根据路由路径生成正则
 
   debug('defined route %s %s', this.methods, this.opts.prefix + this.path);
 };
 
 /**
- * Returns whether request `path` matches route.
+ * 判断请求路径是否与路由匹配
  *
  * @param {String} path
  * @returns {Boolean}
@@ -98,7 +99,7 @@ Layer.prototype.captures = function (path) {
 };
 
 /**
- * Generate URL for route using given `params`.
+ * 根据给定的参数(`params`)生成URL
  *
  * @example
  *

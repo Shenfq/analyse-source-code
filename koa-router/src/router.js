@@ -18,28 +18,8 @@ var Layer = require('./layer');
 module.exports = Router;
 
 /**
- * Create a new router.
- *
- * @example
- *
- * Basic usage:
- *
- * ```javascript
- * var Koa = require('koa');
- * var Router = require('koa-router');
- *
- * var app = new Koa();
- * var router = new Router();
- *
- * router.get('/', (ctx, next) => {
- *   // ctx.router available
- * });
- *
- * app
- *   .use(router.routes())
- *   .use(router.allowedMethods());
- * ```
- *
+ * router的构造函数.
+ * 
  * @alias module:koa-router
  * @param {Object=} opts
  * @param {String=} opts.prefix prefix router paths
@@ -67,118 +47,8 @@ function Router(opts) {
 };
 
 /**
- * Create `router.verb()` methods, where *verb* is one of the HTTP verbs such
- * as `router.get()` or `router.post()`.
- *
- * Match URL patterns to callback functions or controller actions using `router.verb()`,
- * where **verb** is one of the HTTP verbs such as `router.get()` or `router.post()`.
- *
- * Additionaly, `router.all()` can be used to match against all methods.
- *
- * ```javascript
- * router
- *   .get('/', (ctx, next) => {
- *     ctx.body = 'Hello World!';
- *   })
- *   .post('/users', (ctx, next) => {
- *     // ...
- *   })
- *   .put('/users/:id', (ctx, next) => {
- *     // ...
- *   })
- *   .del('/users/:id', (ctx, next) => {
- *     // ...
- *   })
- *   .all('/users/:id', (ctx, next) => {
- *     // ...
- *   });
- * ```
- *
- * When a route is matched, its path is available at `ctx._matchedRoute` and if named,
- * the name is available at `ctx._matchedRouteName`
- *
- * Route paths will be translated to regular expressions using
- * [path-to-regexp](https://github.com/pillarjs/path-to-regexp).
- *
- * Query strings will not be considered when matching requests.
- *
- * #### Named routes
- *
- * Routes can optionally have names. This allows generation of URLs and easy
- * renaming of URLs during development.
- *
- * ```javascript
- * router.get('user', '/users/:id', (ctx, next) => {
- *  // ...
- * });
- *
- * router.url('user', 3);
- * // => "/users/3"
- * ```
- *
- * #### Multiple middleware
- *
- * Multiple middleware may be given:
- *
- * ```javascript
- * router.get(
- *   '/users/:id',
- *   (ctx, next) => {
- *     return User.findOne(ctx.params.id).then(function(user) {
- *       ctx.user = user;
- *       next();
- *     });
- *   },
- *   ctx => {
- *     console.log(ctx.user);
- *     // => { id: 17, name: "Alex" }
- *   }
- * );
- * ```
- *
- * ### Nested routers
- *
- * Nesting routers is supported:
- *
- * ```javascript
- * var forums = new Router();
- * var posts = new Router();
- *
- * posts.get('/', (ctx, next) => {...});
- * posts.get('/:pid', (ctx, next) => {...});
- * forums.use('/forums/:fid/posts', posts.routes(), posts.allowedMethods());
- *
- * // responds to "/forums/123/posts" and "/forums/123/posts/123"
- * app.use(forums.routes());
- * ```
- *
- * #### Router prefixes
- *
- * Route paths can be prefixed at the router level:
- *
- * ```javascript
- * var router = new Router({
- *   prefix: '/users'
- * });
- *
- * router.get('/', ...); // responds to "/users"
- * router.get('/:id', ...); // responds to "/users/:id"
- * ```
- *
- * #### URL parameters
- *
- * Named route parameters are captured and added to `ctx.params`.
- *
- * ```javascript
- * router.get('/:category/:title', (ctx, next) => {
- *   console.log(ctx.params);
- *   // => { category: 'programming', title: 'how-to-node' }
- * });
- * ```
- *
- * The [path-to-regexp](https://github.com/pillarjs/path-to-regexp) module is
- * used to convert paths to regular expressions.
- *
+ * 在router的原型链上注册http的method
+ * 
  * @name get|put|post|patch|delete|del
  * @memberof module:koa-router.prototype
  * @param {String} path
@@ -190,7 +60,7 @@ function Router(opts) {
 methods.forEach(function (method) {
   Router.prototype[method] = function (name, path, middleware) {
     var middleware;
-
+    // 参数校验，判断是否传入name，并且将middleware转为数组
     if (typeof path === 'string' || path instanceof RegExp) {
       middleware = Array.prototype.slice.call(arguments, 2);
     } else {
@@ -198,7 +68,7 @@ methods.forEach(function (method) {
       path = name;
       name = null;
     }
-
+    // 注册路由
     this.register(path, [method], middleware, {
       name: name
     });
@@ -212,28 +82,7 @@ Router.prototype.del = Router.prototype['delete'];
 
 /**
  * Use given middleware.
- *
- * Middleware run in the order they are defined by `.use()`. They are invoked
- * sequentially, requests start at the first middleware and work their way
- * "down" the middleware stack.
- *
- * @example
- *
- * ```javascript
- * // session middleware will run before authorize
- * router
- *   .use(session())
- *   .use(authorize());
- *
- * // use middleware only with given path
- * router.use('/users', userAuth());
- *
- * // or with an array of paths
- * router.use(['/users', '/admin'], userAuth());
- *
- * app.use(router.routes());
- * ```
- *
+ * 
  * @param {String=} path
  * @param {Function} middleware
  * @param {Function=} ...
@@ -281,13 +130,7 @@ Router.prototype.use = function () {
 };
 
 /**
- * Set the path prefix for a Router instance that was already initialized.
- *
- * @example
- *
- * ```javascript
- * router.prefix('/things/:thing_id')
- * ```
+ * 为已经注册的路由添加路由前缀
  *
  * @param {String} prefix
  * @returns {Router}
@@ -306,7 +149,7 @@ Router.prototype.prefix = function (prefix) {
 };
 
 /**
- * Returns router middleware which dispatches a route matching the request.
+ * 返回一个路由中间件，该中间件用于匹配请求的路由，并分发给路由指定的回调函数
  *
  * @returns {Function}
  */
@@ -357,40 +200,10 @@ Router.prototype.routes = Router.prototype.middleware = function () {
 };
 
 /**
+ * 用于过滤请求的回调函数
  * Returns separate middleware for responding to `OPTIONS` requests with
  * an `Allow` header containing the allowed methods, as well as responding
  * with `405 Method Not Allowed` and `501 Not Implemented` as appropriate.
- *
- * @example
- *
- * ```javascript
- * var Koa = require('koa');
- * var Router = require('koa-router');
- *
- * var app = new Koa();
- * var router = new Router();
- *
- * app.use(router.routes());
- * app.use(router.allowedMethods());
- * ```
- *
- * **Example with [Boom](https://github.com/hapijs/boom)**
- *
- * ```javascript
- * var Koa = require('koa');
- * var Router = require('koa-router');
- * var Boom = require('boom');
- *
- * var app = new Koa();
- * var router = new Router();
- *
- * app.use(router.routes());
- * app.use(router.allowedMethods({
- *   throw: true,
- *   notImplemented: () => new Boom.notImplemented(),
- *   methodNotAllowed: () => new Boom.methodNotAllowed()
- * }));
- * ```
  *
  * @param {Object=} options
  * @param {Boolean=} options.throw throw error instead of setting status and header
@@ -455,7 +268,7 @@ Router.prototype.allowedMethods = function (options) {
 };
 
 /**
- * Register route with all methods.
+ * 为所有方法都注册路由.
  *
  * @param {String} name Optional.
  * @param {String} path
@@ -484,22 +297,8 @@ Router.prototype.all = function (name, path, middleware) {
 };
 
 /**
+ * 重定向`source`到`destination`的路径，并给定一个30X的状态码
  * Redirect `source` to `destination` URL with optional 30x status `code`.
- *
- * Both `source` and `destination` can be route names.
- *
- * ```javascript
- * router.redirect('/login', 'sign-in');
- * ```
- *
- * This is equivalent to:
- *
- * ```javascript
- * router.all('/login', ctx => {
- *   ctx.redirect('/sign-in');
- *   ctx.status = 301;
- * });
- * ```
  *
  * @param {String} source URL or route name.
  * @param {String} destination URL or route name.
@@ -525,7 +324,7 @@ Router.prototype.redirect = function (source, destination, code) {
 };
 
 /**
- * Create and register a route.
+ * 创建并注册一个路由.
  *
  * @param {String} path Path string.
  * @param {Array.<String>} methods Array of HTTP verbs.
@@ -538,9 +337,9 @@ Router.prototype.register = function (path, methods, middleware, opts) {
   opts = opts || {};
 
   var router = this;
-  var stack = this.stack;
+  var stack = this.stack; // 存储路由表的栈
 
-  // support array of paths
+  // 路径支持数组的形式
   if (Array.isArray(path)) {
     path.forEach(function (p) {
       router.register.call(router, p, methods, middleware, opts);
@@ -549,7 +348,7 @@ Router.prototype.register = function (path, methods, middleware, opts) {
     return this;
   }
 
-  // create route
+  // 创建一个路由层，进行Layer实例化
   var route = new Layer(path, methods, middleware, {
     end: opts.end === false ? opts.end : true,
     name: opts.name,
@@ -574,7 +373,7 @@ Router.prototype.register = function (path, methods, middleware, opts) {
 };
 
 /**
- * Lookup route with given `name`.
+ * 通过`name`查找具体路由
  *
  * @param {String} name
  * @returns {Layer|false}
@@ -593,7 +392,7 @@ Router.prototype.route = function (name) {
 };
 
 /**
- * Generate URL for route. Takes a route name and map of named `params`.
+ * 为指定路由传入参数`params`，并生成URL
  *
  * @example
  *
@@ -601,17 +400,6 @@ Router.prototype.route = function (name) {
  * router.get('user', '/users/:id', (ctx, next) => {
  *   // ...
  * });
- *
- * router.url('user', 3);
- * // => "/users/3"
- *
- * router.url('user', { id: 3 });
- * // => "/users/3"
- *
- * router.use((ctx, next) => {
- *   // redirect to named route
- *   ctx.redirect(ctx.router.url('sign-in'));
- * })
  *
  * router.url('user', { id: 3 }, { query: { limit: 1 } });
  * // => "/users/3?limit=1"
@@ -639,6 +427,7 @@ Router.prototype.url = function (name, params) {
 };
 
 /**
+ * 匹配给定的路径，返回相应的路由
  * Match given `path` and return corresponding routes.
  *
  * @param {String} path
@@ -676,8 +465,8 @@ Router.prototype.match = function (path, method) {
 };
 
 /**
- * Run middleware for named route parameters. Useful for auto-loading or
- * validation.
+ * 为指定的路由参数(param)运行中间件
+ * 用于自动加载或校验
  *
  * @example
  *
@@ -714,14 +503,10 @@ Router.prototype.param = function (param, middleware) {
 };
 
 /**
- * Generate URL from url pattern and given `params`.
+ * 根据指定的路由模式已经参数生成URL
  *
  * @example
- *
- * ```javascript
- * var url = Router.url('/users/:id', {id: 1});
- * // => "/users/1"
- * ```
+ * url('/users/:id', {id: 1}) => "/users/1"
  *
  * @param {String} path url pattern
  * @param {Object} params url parameters
