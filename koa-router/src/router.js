@@ -77,11 +77,11 @@ methods.forEach(function (method) {
   };
 });
 
-// Alias for `router.delete()` because delete is a reserved word
+// 为delete方法定义别名，因为delete是一个关键词
 Router.prototype.del = Router.prototype['delete'];
 
 /**
- * Use given middleware.
+ * 运行指定的中间件.
  * 
  * @param {String=} path
  * @param {Function} middleware
@@ -159,8 +159,9 @@ Router.prototype.routes = Router.prototype.middleware = function () {
 
   var dispatch = function dispatch(ctx, next) {
     debug('%s %s', ctx.method, ctx.path);
-
+    // 获取当前请求的路径
     var path = router.opts.routerPath || ctx.routerPath || ctx.path;
+    // 根据路径匹配对应路由
     var matched = router.match(path, ctx.method);
     var layerChain, layer, i;
 
@@ -172,6 +173,7 @@ Router.prototype.routes = Router.prototype.middleware = function () {
 
     ctx.router = router;
 
+    // 如果没有匹配到路由，直接return
     if (!matched.route) return next();
 
     var matchedLayers = matched.pathAndMethod
@@ -180,17 +182,20 @@ Router.prototype.routes = Router.prototype.middleware = function () {
     if (mostSpecificLayer.name) {
       ctx._matchedRouteName = mostSpecificLayer.name;
     }
-
+    // 将所有匹配到的路由的所有回调中间件，集合到一个数组中
     layerChain = matchedLayers.reduce(function(memo, layer) {
       memo.push(function(ctx, next) {
+        // 获取路由正则捕获的参数
         ctx.captures = layer.captures(path, ctx.captures);
+        // 获取参数，并进行校验
         ctx.params = layer.params(path, ctx.captures, ctx.params);
         ctx.routerName = layer.name;
         return next();
       });
+      // 中间件的合并
       return memo.concat(layer.stack);
     }, []);
-
+    // 通过compose构造路由层的洋葱模型
     return compose(layerChain)(ctx, next);
   };
 
@@ -394,20 +399,6 @@ Router.prototype.route = function (name) {
 /**
  * 为指定路由传入参数`params`，并生成URL
  *
- * @example
- *
- * ```javascript
- * router.get('user', '/users/:id', (ctx, next) => {
- *   // ...
- * });
- *
- * router.url('user', { id: 3 }, { query: { limit: 1 } });
- * // => "/users/3?limit=1"
- *
- * router.url('user', { id: 3 }, { query: "limit=1" });
- * // => "/users/3?limit=1"
- * ```
- *
  * @param {String} name route name
  * @param {Object} params url parameters
  * @param {Object} [options] options parameter
@@ -445,15 +436,15 @@ Router.prototype.match = function (path, method) {
     pathAndMethod: [],
     route: false
   };
-
+  // 遍历路由层
   for (var len = layers.length, i = 0; i < len; i++) {
     layer = layers[i];
 
     debug('test %s %s', layer.path, layer.regexp);
 
-    if (layer.match(path)) {
+    if (layer.match(path)) { // 判断当前路径是否与路由正则匹配
       matched.path.push(layer);
-
+      // 判断请求方法是否与注册的请求方法匹配
       if (layer.methods.length === 0 || ~layer.methods.indexOf(method)) {
         matched.pathAndMethod.push(layer);
         if (layer.methods.length) matched.route = true;
@@ -467,27 +458,6 @@ Router.prototype.match = function (path, method) {
 /**
  * 为指定的路由参数(param)运行中间件
  * 用于自动加载或校验
- *
- * @example
- *
- * ```javascript
- * router
- *   .param('user', (id, ctx, next) => {
- *     ctx.user = users[id];
- *     if (!ctx.user) return ctx.status = 404;
- *     return next();
- *   })
- *   .get('/users/:user', ctx => {
- *     ctx.body = ctx.user;
- *   })
- *   .get('/users/:user/friends', ctx => {
- *     return ctx.user.getFriends().then(function(friends) {
- *       ctx.body = friends;
- *     });
- *   })
- *   // /users/3 => {"id": 3, "name": "Alex"}
- *   // /users/3/friends => [{"id": 4, "name": "TJ"}]
- * ```
  *
  * @param {String} param
  * @param {Function} middleware

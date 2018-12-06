@@ -153,21 +153,7 @@ Layer.prototype.url = function (params, options) {
 };
 
 /**
- * Run validations on route named parameters.
- *
- * @example
- *
- * ```javascript
- * router
- *   .param('user', function (id, ctx, next) {
- *     ctx.user = users[id];
- *     if (!user) return ctx.status = 404;
- *     next();
- *   })
- *   .get('/users/:user', function (ctx, next) {
- *     ctx.body = ctx.user;
- *   });
- * ```
+ * 对路由指定的param进行一些校验
  *
  * @param {String} param
  * @param {Function} middleware
@@ -205,7 +191,7 @@ Layer.prototype.param = function (param, fn) {
 };
 
 /**
- * Prefix route path.
+ * 添加路由前缀
  *
  * @param {String} prefix
  * @returns {Layer}
