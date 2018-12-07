@@ -147,7 +147,7 @@ module.exports = class Application extends Emitter {
 
   handleRequest(ctx, fnMiddleware) {
     const res = ctx.res;
-    res.statusCode = 404;
+    res.statusCode = 404; // 状态码默认为404
     const onerror = err => ctx.onerror(err);
     const handleResponse = () => respond(ctx);
     onFinished(res, onerror); // 用于检测node的http服务是否异常，如果异常也会调用onerror处理异常
