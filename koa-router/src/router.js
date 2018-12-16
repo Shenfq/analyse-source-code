@@ -219,13 +219,14 @@ Router.prototype.routes = Router.prototype.middleware = function () {
 
 Router.prototype.allowedMethods = function (options) {
   options = options || {};
-  var implemented = this.methods;
+  var implemented = this.methods; // 常规的请求方法
 
   return function allowedMethods(ctx, next) {
     return next().then(function() {
       var allowed = {};
-
+      // 如果返回状态码为空，或者404（ps: koa状态码默认为404）
       if (!ctx.status || ctx.status === 404) {
+        // 取出所有匹配的路径（仅仅是路径匹配，请求方法不一定匹配）的路由
         ctx.matched.forEach(function (route) {
           route.methods.forEach(function (method) {
             allowed[method] = method;
@@ -234,8 +235,9 @@ Router.prototype.allowedMethods = function (options) {
 
         var allowedArr = Object.keys(allowed);
 
-        if (!~implemented.indexOf(ctx.method)) {
-          if (options.throw) {
+        // 判断当前请求是否属于常规请求方法 
+        if (!~implemented.indexOf(ctx.method)) { 
+          if (options.throw) { // 如果设置了可抛出异常，则抛出异常
             var notImplementedThrowable;
             if (typeof options.notImplemented === 'function') {
               notImplementedThrowable = options.notImplemented(); // set whatever the user returns from their function
@@ -244,10 +246,13 @@ Router.prototype.allowedMethods = function (options) {
             }
             throw notImplementedThrowable;
           } else {
+            // 返回501状态码
+            // HTTP 501 Not Implemented 服务器错误响应码表示请求的方法不被服务器支持，因此无法被处理。
             ctx.status = 501;
             ctx.set('Allow', allowedArr.join(', '));
           }
         } else if (allowedArr.length) {
+          // options请求，返回成功，且内容为空
           if (ctx.method === 'OPTIONS') {
             ctx.status = 200;
             ctx.body = '';
@@ -262,6 +267,8 @@ Router.prototype.allowedMethods = function (options) {
               }
               throw notAllowedThrowable;
             } else {
+              // 如果路径被匹配，但是请求方法为匹配，返回405
+              // 状态码 405 Method Not Allowed 表明服务器禁止了使用当前 HTTP 方法的请求。
               ctx.status = 405;
               ctx.set('Allow', allowedArr.join(', '));
             }
